@@ -138,7 +138,7 @@ void logData(char name[], int value)
 void logFinish()
 {
   // Add a new line to the end of the current log line
-  logString("\n");
+  logString("\r\n");
   
   // Write the current line of the log to the sd card
   commitLogLine(currentLogLine);
@@ -160,7 +160,7 @@ void readMoisture()
   // read the value from the sensor:
   moistureSensorValue = analogRead(moistureSensorPin);    
   
-  moistureSensorValue = map(moistureSensorValue, mositureSensorHigh, moistureSensorLow, moistureValueLow, moistureValueHigh);
+  moistureSensorValue = map(moistureSensorValue, moistureSensorHigh, moistureSensorLow, moistureValueLow, moistureValueHigh);
 }
 
 void readLight()

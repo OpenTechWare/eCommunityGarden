@@ -8,6 +8,10 @@
 		<title>Garden Monitor - Charts</title>
 		<script runat="server">
 		
+			int maxPoints = 100;
+			int autoRefreshMinutes = 1;
+			int autoRefreshSeconds = 0;
+
 			int[] temperatures = new int[]{};
 			int[] humidity = new int[]{};
 			int[] light = new int[]{};
@@ -22,6 +26,22 @@
 				var lines = File.ReadAllText(fileName);
 				
 				data = lines;
+
+				if (IsPostBack)
+				{
+	//				autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
+	//				autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
+	//				maxPoints = Convert.ToInt32(MaxPointsBox.Text);
+				}
+				else
+					DataBind();
+			}
+
+			void RefreshButton_Click(object sender, EventArgs e)
+			{
+                                        autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
+                                        autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
+                                        maxPoints = Convert.ToInt32(MaxPointsBox.Text);
 			}
 		
 			string GetDataValues(string label)
@@ -32,6 +52,8 @@
 				builder.Append("dataPoints: [");
 				
 				var parser = new DataLogParser();
+
+				parser.MaxPoints = maxPoints;
 				
 				int i = 0;
 				
@@ -49,7 +71,7 @@
 				}
 				
 				builder.Append("]");
-	            return builder.ToString();
+	            		return builder.ToString();
 			}
 			
 			string GetChartScript(string label, string containerId)
@@ -63,7 +85,7 @@
 			      },
 			      axisX: {
 			        valueFormatString: """",
-			        interval:1000,
+			        interval:" + maxPoints / 10 + @",
 			        intervalType: ""month""
 			        
 			      },
@@ -82,18 +104,77 @@
 				
 				return scr;
 			}
+
+			string GetRefreshScript()
+			{
+				var scr = @"
+
+	                        // Auto Refresh Page with Time script
+                	        // By JavaScript Kit (javascriptkit.com)
+                        	// Over 200+ free scripts here
+
+        	                //enter refresh time in ""minutes:seconds"" Minutes should range from 0 to inifinity. Seconds should range from 0 to 59
+                	        var limit='" + autoRefreshMinutes + ":" + autoRefreshSeconds + @"';
+	
+        	                if (document.images){
+                	                var parselimit=limit.split("":"")
+                        	        parselimit=parselimit[0]*60+parselimit[1]*1
+		                }
+
+	       	                function beginrefresh(){
+               	        	        if (!document.images)
+                       		                return
+        	                        if (parselimit==1)
+       		                                document.getElementById('RefreshButton').click();
+                	                else{
+                       	                	parselimit-=1
+                               		        curmin=Math.floor(parselimit/60)
+                                	        cursec=parselimit%60
+                        	                if (curmin!=0)
+                	                                curtime=curmin+"" minutes and ""+cursec+"" seconds left until page refresh!""
+        	                                else
+	                                                curtime=cursec+"" seconds left until page refresh!""
+                                	        window.status=curtime
+                        	                setTimeout(""beginrefresh()"",1000)
+                	                }
+        	                }";
+
+				return scr;
+			}
 		</script>
-        <script src="js/jQuery/jquery-2.1.1.min.js"></script>
         <script src="js/canvasjs/canvasjs.min.js"></script>
         <script>
-			  window.onload = function () {
+                        <% if (AutoRefreshCheckBox.Checked) { %>
+                        	<%= GetRefreshScript() %>
+                        <% } %>
+
+
+
+			 window.onload = function () {
 			  
 			  	<%= GetChartScript("Temperature", "temperatureContainer") %>
 			  	<%= GetChartScript("Humidity", "humidityContainer") %>
 			  	<%= GetChartScript("Moisture", "moistureContainer") %>
 			  	<%= GetChartScript("Light", "lightContainer") %>
+
+				<% if (AutoRefreshCheckBox.Checked) { %>
+					beginrefresh();
+				<% } %>
 			}
+
+
         </script>
+	<style>
+	body
+	{
+		font-family: Verdana;
+	}
+
+	.Desc
+	{
+		font-size: 10px;
+	}
+	</style>
 	</head>
 	<body>
 		<form id="form1" runat="server">
@@ -119,6 +200,19 @@
 		  		</td>
 			</tr>
 		</table>
+		<div><b>Settings:</b></div>
+		<p>
+			Maximum points:<br/>
+			<span class="Desc">(The maximum number of points displayed on each graph. Choose fewer points to make the page load faster. Choose a greater number for more detail.)</span><br/>
+			<asp:TextBox runat="server" id="MaxPointsBox" text='<%# maxPoints %>' /><br/>
+		</p>
+		<p>
+			Auto refresh: <asp:CheckBox runat="server" id="AutoRefreshCheckBox" Checked="true" onclientclick="document.getElementById('RefreshButton').click();" /><br/>
+			[minutes:seconds]: <asp:TextBox runat="server" id="RefreshMinutesBox" Text='<%# autoRefreshMinutes %>' width="30" />:<asp:TextBox runat="server" id="RefreshSecondsBox" Text='<%# autoRefreshSeconds %>' width="30" />
+		</p>
+		<p>
+			<asp:button runat="server" id="RefreshButton" text="Refresh" onclick="RefreshButton_Click" />
+		</p>
 		</form>
 	</body>
 </html>
