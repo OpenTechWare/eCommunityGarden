@@ -1,8 +1,28 @@
 
+// SD card
 #include <SD.h>
+
+// Temperature/humidity sensor
 #include <DHT11.h>
 
+// RTC (real time clock) 
+#include <stdio.h>
+#include <string.h>
+#include <DS1302.h>
+
+/* Set the appropriate digital I/O pin connections for RTC */
+uint8_t CE_PIN   = 5;
+uint8_t IO_PIN   = 6;
+uint8_t SCLK_PIN = 7;
+
+/* Create buffers for RTC */
+char buf[50];
+char day[10];
+
 int powerLedPin = 9;
+
+/* Create a DS1302 object for RTC */
+DS1302 rtc(CE_PIN, IO_PIN, SCLK_PIN);
 
 int moistureSensorPin = A4; 
 int moistureSensorValue = 0;  // variable to store the value coming from the sensor
@@ -31,11 +51,54 @@ int threshold = 400;
 
 int chipSelect = 4;
 
-int delayTime = 1000;
+int delayTime = 2000;
 
 char logFileName[ ] = "datalog.txt";
 
 DHT11 dht11(humidityTempPin); 
+
+String dateTime = "";
+
+void getTime()
+{
+  /* Get the current time and date from the chip */
+  Time t = rtc.time();
+
+  /* Name the day of the week */
+  memset(day, 0, sizeof(day));  /* clear day buffer */
+  switch (t.day) {
+    case 1:
+      strcpy(day, "Sunday");
+      break;
+    case 2:
+      strcpy(day, "Monday");
+      break;
+    case 3:
+      strcpy(day, "Tuesday");
+      break;
+    case 4:
+      strcpy(day, "Wednesday");
+      break;
+    case 5:
+      strcpy(day, "Thursday");
+      break;
+    case 6:
+      strcpy(day, "Friday");
+      break;
+    case 7:
+      strcpy(day, "Saturday");
+      break;
+  }
+
+  /* Format the time and date and insert into the temporary buffer */
+  snprintf(buf, sizeof(buf), "%s %04d-%02d-%02d %02d:%02d:%02d",
+           day,
+           t.yr, t.mon, t.date,
+           t.hr, t.min, t.sec);
+
+  /* Print the formatted string to serial so we can see the time */
+  dateTime = buf;
+}
 
 // Store the current log line as a variable then write it to the log when it's finished
 // When written directly to the log then there's a risk of log file corruption if the arduino is turned off part way through a line
@@ -56,7 +119,11 @@ void setup() {
   initializeSDCard();
 }
 
+
+
 void loop() {
+  getTime();
+  
   readMoisture();
   
   readLight();
@@ -64,6 +131,7 @@ void loop() {
   readHumidityTemp();
   
   logStart();
+  logData("DateTime", dateTime);
   logData("Moisture", moistureSensorValue);
   logData("Light", lightSensorValue);
   logData("Humidity", humidity);
@@ -121,7 +189,16 @@ void commitLogLine(String value)
   } 
 }
 
-void logData(char name[], int value)
+void logData(String name, int value)
+{
+   char output[50];
+   
+   snprintf(output,50,"%d",value);
+   
+   logData(name, output);
+}
+
+void logData(String name, String value)
 {
   // make a string for assembling the data to log:
   String dataString = "";

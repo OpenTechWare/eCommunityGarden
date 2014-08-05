@@ -12,16 +12,16 @@ namespace GardenManager.Core
 		{
 		}
 
-		public int[] GetValues(string data, string label)
+		public Dictionary<string, int> GetValues(string data, string label)
 		{
 			var lines = data.Split (Environment.NewLine.ToCharArray(), StringSplitOptions.None);
 
 			return GetValues (lines, label);
 		}		
 
-		public int[] GetValues(string[] dataLines, string label)
+		public Dictionary<string, int> GetValues(string[] dataLines, string label)
 		{
-			var list = new List<int> ();
+			var dict = new Dictionary<string, int> ();
 
 			string fullLabel = label + ": ";
 
@@ -48,6 +48,8 @@ namespace GardenManager.Core
 						// Increment the counter
 						i++;
 
+						var dateTimeString = GetDateTimeString (parts);
+
 						// If the current line count matches the interval (ie. the current line count
 						// is a factor of the interval with no remainder)
 						if ((i % interval) == 0)
@@ -63,14 +65,27 @@ namespace GardenManager.Core
 									);
 	
 									// Add the value to the list
-									list.Add (value);
+									if (!dict.ContainsKey(dateTimeString))
+										dict.Add(dateTimeString, value);
 								}
 							}
 					}	}
 				}
 			}
 
-			return list.ToArray ();
+			return dict;
+		}
+
+		public string GetDateTimeString(string[] lineParts)
+		{
+			var output = String.Empty;
+
+			foreach (var part in lineParts) {
+				if (part.Trim().StartsWith ("DateTime"))
+					output = part.Replace ("DateTime: ", "").Trim ();
+			}
+
+			return output;
 		}
 	}
 }

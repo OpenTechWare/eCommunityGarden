@@ -27,21 +27,15 @@
 				
 				data = lines;
 
-				if (IsPostBack)
-				{
-	//				autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
-	//				autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
-	//				maxPoints = Convert.ToInt32(MaxPointsBox.Text);
-				}
-				else
+				if (!IsPostBack)
 					DataBind();
 			}
 
 			void RefreshButton_Click(object sender, EventArgs e)
 			{
-                                        autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
-                                        autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
-                                        maxPoints = Convert.ToInt32(MaxPointsBox.Text);
+                autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
+                autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
+                maxPoints = Convert.ToInt32(MaxPointsBox.Text);
 			}
 		
 			string GetDataValues(string label)
@@ -49,6 +43,7 @@
 				var builder = new StringBuilder();
 			
 				builder.Append("type: \"line\",");
+				builder.Append("xValueType: \"dateTime\",");
 				builder.Append("dataPoints: [");
 				
 				var parser = new DataLogParser();
@@ -59,13 +54,22 @@
 				
 				var values = parser.GetValues(data, label);
 				
-				foreach (var temp in values)
+				foreach (var pair in values)
 				{
 					i++;
-					builder.Append("{ ");
-					builder.Append(String.Format("x: {0}, y: {1}", i, temp));
+					
+					var dateTime = DateTime.Parse(pair.Key);
+					
+					var jsTimeStamp = dateTime.Subtract(
+						new DateTime(1970,1,1,0,0,0))
+               			.TotalMilliseconds;
+               		
+               		//var jsTimeStamp = DateTime.Now.Subtract(new DateTime(1970, 1,1)).TotalMilliseconds;
+					
+					builder.Append("{ "); 
+					builder.Append(String.Format("x: {0}, y: {1}", jsTimeStamp, pair.Value));
 					builder.Append("}");
-					if (i < values.Length)
+					if (i < values.Count)
 						builder.Append(",");
 					builder.Append(Environment.NewLine);
 				}
@@ -84,17 +88,17 @@
 			        text: """ + label + @"""
 			      },
 			      axisX: {
-			        valueFormatString: """",
-			        interval:" + maxPoints / 10 + @",
-			        intervalType: ""month""
-			        
+            		valueFormatString: ""DD-MMM HH:mm:ss"",
+			        interval:" + 2  + @",
+            		labelAngle: -70,
+			        intervalType: ""minute""
 			      },
 			      axisY:{
-			        includeZero: false
+			        includeZero: true
 			        
 			      },
 			      data: [
-			      {        
+			      {
 			        " + GetDataValues(label) + @"
 			      }	 
 			      ]
@@ -108,47 +112,44 @@
 			string GetRefreshScript()
 			{
 				var scr = @"
+	                // Auto Refresh Page with Time script
+	    	        // By JavaScript Kit (javascriptkit.com)
+	            	// Over 200+ free scripts here
 
-	                        // Auto Refresh Page with Time script
-                	        // By JavaScript Kit (javascriptkit.com)
-                        	// Over 200+ free scripts here
+	                //enter refresh time in ""minutes:seconds"" Minutes should range from 0 to inifinity. Seconds should range from 0 to 59
+	    	        var limit='" + autoRefreshMinutes + ":" + autoRefreshSeconds + @"';
 
-        	                //enter refresh time in ""minutes:seconds"" Minutes should range from 0 to inifinity. Seconds should range from 0 to 59
-                	        var limit='" + autoRefreshMinutes + ":" + autoRefreshSeconds + @"';
-	
-        	                if (document.images){
-                	                var parselimit=limit.split("":"")
-                        	        parselimit=parselimit[0]*60+parselimit[1]*1
-		                }
+	                if (document.images){
+	    	                var parselimit=limit.split("":"")
+	            	        parselimit=parselimit[0]*60+parselimit[1]*1
+	            }
 
-	       	                function beginrefresh(){
-               	        	        if (!document.images)
-                       		                return
-        	                        if (parselimit==1)
-       		                                document.getElementById('RefreshButton').click();
-                	                else{
-                       	                	parselimit-=1
-                               		        curmin=Math.floor(parselimit/60)
-                                	        cursec=parselimit%60
-                        	                if (curmin!=0)
-                	                                curtime=curmin+"" minutes and ""+cursec+"" seconds left until page refresh!""
-        	                                else
-	                                                curtime=cursec+"" seconds left until page refresh!""
-                                	        window.status=curtime
-                        	                setTimeout(""beginrefresh()"",1000)
-                	                }
-        	                }";
+	                function beginrefresh(){
+	   	        	        if (!document.images)
+	           		                return
+	                        if (parselimit==1)
+	                                document.getElementById('RefreshButton').click();
+	    	                else{
+	           	                	parselimit-=1
+	                   		        curmin=Math.floor(parselimit/60)
+	                    	        cursec=parselimit%60
+	            	                if (curmin!=0)
+	    	                                curtime=curmin+"" minutes and ""+cursec+"" seconds left until page refresh!""
+	                                else
+	                                        curtime=cursec+"" seconds left until page refresh!""
+	                    	        window.status=curtime
+	            	                setTimeout(""beginrefresh()"",1000)
+	    	                }
+	                }";
 
 				return scr;
 			}
 		</script>
         <script src="js/canvasjs/canvasjs.min.js"></script>
         <script>
-                        <% if (AutoRefreshCheckBox.Checked) { %>
-                        	<%= GetRefreshScript() %>
-                        <% } %>
-
-
+            <% if (AutoRefreshCheckBox.Checked) { %>
+            	<%= GetRefreshScript() %>
+            <% } %>
 
 			 window.onload = function () {
 			  
@@ -204,11 +205,13 @@
 		<p>
 			Maximum points:<br/>
 			<span class="Desc">(The maximum number of points displayed on each graph. Choose fewer points to make the page load faster. Choose a greater number for more detail.)</span><br/>
-			<asp:TextBox runat="server" id="MaxPointsBox" text='<%# maxPoints %>' /><br/>
+			<asp:TextBox runat="server" id="MaxPointsBox" text='<%# maxPoints %>'></asp:TextBox><br/>
 		</p>
 		<p>
 			Auto refresh: <asp:CheckBox runat="server" id="AutoRefreshCheckBox" Checked="true" onclientclick="document.getElementById('RefreshButton').click();" /><br/>
-			[minutes:seconds]: <asp:TextBox runat="server" id="RefreshMinutesBox" Text='<%# autoRefreshMinutes %>' width="30" />:<asp:TextBox runat="server" id="RefreshSecondsBox" Text='<%# autoRefreshSeconds %>' width="30" />
+			[minutes:seconds]:
+			 <asp:TextBox runat="server" id="RefreshMinutesBox" Text='<%# autoRefreshMinutes %>' width="30"></asp:TextBox>
+			 :<asp:TextBox runat="server" id="RefreshSecondsBox" Text='<%# autoRefreshSeconds %>' width="30"></asp:TextBox>
 		</p>
 		<p>
 			<asp:button runat="server" id="RefreshButton" text="Refresh" onclick="RefreshButton_Click" />
