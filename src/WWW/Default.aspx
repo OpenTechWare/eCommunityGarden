@@ -12,6 +12,7 @@
 			bool autoRefresh = true;
 			int autoRefreshMinutes = 1;
 			int autoRefreshSeconds = 0;
+			int interval = 2;
 
 			int[] temperatures = new int[]{};
 			int[] humidity = new int[]{};
@@ -41,6 +42,10 @@
 						
 					if (!String.IsNullOrEmpty(Request.QueryString["RefSec"]))
 						autoRefreshSeconds = Convert.ToInt32(Request.QueryString["RefSec"]);
+												
+					if (!String.IsNullOrEmpty(Request.QueryString["Interval"]))
+						interval = Convert.ToInt32(Request.QueryString["Interval"]);
+
 						
 					DataBind();
 				}
@@ -52,15 +57,17 @@
                 autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
                 autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
                 maxPoints = Convert.ToInt32(MaxPointsBox.Text);
+                interval = Convert.ToInt32(IntervalBox.Text);
                 
                 // TODO: Remove hard coding of file path
                 Response.Redirect(
                 	String.Format(
-                		"Default.aspx?MaxPoints={0}&AutoRef={1}&RefMin={2}&RefSec={3}",
+                		"Default.aspx?MaxPoints={0}&AutoRef={1}&RefMin={2}&RefSec={3}&Interval={4}",
                 		maxPoints,
                 		autoRefresh,
                 		autoRefreshMinutes,
-                		autoRefreshSeconds
+                		autoRefreshSeconds,
+                		interval
                 	)
                 );
 			}
@@ -116,7 +123,7 @@
 			      },
 			      axisX: {
             		valueFormatString: ""DD-MMM HH:mm:ss"",
-			        interval:" + 2  + @",
+			        interval:" + interval  + @",
             		labelAngle: -70,
 			        intervalType: ""minute""
 			      },
@@ -239,6 +246,9 @@
 			[minutes:seconds]:
 			 <asp:TextBox runat="server" id="RefreshMinutesBox" Text='<%# autoRefreshMinutes %>' width="30"></asp:TextBox>
 			 :<asp:TextBox runat="server" id="RefreshSecondsBox" Text='<%# autoRefreshSeconds %>' width="30"></asp:TextBox>
+		</p>
+		<p>
+			Interval: <asp:TextBox runat="server" id="IntervalBox" Text='<%# interval %>' width="30"></asp:TextBox>
 		</p>
 		<p>
 			<asp:button runat="server" id="RefreshButton" text="Refresh" onclick="RefreshButton_Click" />
