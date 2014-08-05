@@ -62,26 +62,29 @@ namespace GardenManager.Core
 
 						var dateTimeString = GetDateTimeString (parts);
 
-						// If the current line count matches the interval (ie. the current line count
-						// is a factor of the interval with no remainder)
-						if ((i % interval) == 0)
-						{ 
-							// Loop through each part of the line
-							foreach (var part in parts) {
-								// Remove whitespace from the current part
-								var fixedPart = part.Trim ();
-								if (fixedPart.StartsWith (fullLabel)) {
-									// Parse the value as an int
-									var value = Convert.ToInt32 (
-										fixedPart.Replace (fullLabel, "").Trim ()
-									);
-	
-									// Add the value to the list
-									if (!dict.ContainsKey(dateTimeString))
-										dict.Add(dateTimeString, value);
+						if (!String.IsNullOrEmpty(dateTimeString.Trim()))
+						{
+							// If the current line count matches the interval (ie. the current line count
+							// is a factor of the interval with no remainder)
+							if ((i % interval) == 0) { 
+								// Loop through each part of the line
+								foreach (var part in parts) {
+									// Remove whitespace from the current part
+									var fixedPart = part.Trim ();
+									if (fixedPart.StartsWith (fullLabel)) {
+										// Parse the value as an int
+										var value = Convert.ToInt32 (
+											fixedPart.Replace (fullLabel, "").Trim ()
+										);
+		
+										// Add the value to the list
+										if (!dict.ContainsKey (dateTimeString))
+											dict.Add (dateTimeString, value);
+									}
 								}
 							}
-					}	}
+						}
+					}
 				}
 			}
 
