@@ -9,6 +9,7 @@
 		<script runat="server">
 		
 			int maxPoints = 100;
+			bool autoRefresh = true;
 			int autoRefreshMinutes = 1;
 			int autoRefreshSeconds = 0;
 
@@ -28,14 +29,40 @@
 				data = lines;
 
 				if (!IsPostBack)
+				{
+					if (!String.IsNullOrEmpty(Request.QueryString["MaxPoints"]))
+						maxPoints = Convert.ToInt32(Request.QueryString["MaxPoints"]);
+						
+					if (!String.IsNullOrEmpty(Request.QueryString["AutoRefresh"]))
+						autoRefresh = Convert.ToBoolean(Request.QueryString["AutoRefresh"]);
+						
+					if (!String.IsNullOrEmpty(Request.QueryString["RefMin"]))
+						autoRefreshMinutes = Convert.ToInt32(Request.QueryString["RefMin"]);
+						
+					if (!String.IsNullOrEmpty(Request.QueryString["RefSec"]))
+						autoRefreshSeconds = Convert.ToInt32(Request.QueryString["RefSec"]);
+						
 					DataBind();
+				}
 			}
 
 			void RefreshButton_Click(object sender, EventArgs e)
 			{
+				autoRefresh = AutoRefreshCheckBox.Checked;
                 autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
                 autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
                 maxPoints = Convert.ToInt32(MaxPointsBox.Text);
+                
+                // TODO: Remove hard coding of file path
+                Response.Redirect(
+                	String.Format(
+                		"Default.aspx?MaxPoints={0}&Ref={1}&RefMin={2}&RefSec={3}",
+                		maxPoints,
+                		autoRefresh,
+                		autoRefreshMinutes,
+                		autoRefreshSeconds
+                	)
+                );
 			}
 		
 			string GetDataValues(string label)
