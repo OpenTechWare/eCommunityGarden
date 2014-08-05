@@ -1,6 +1,7 @@
 <%@ Page Language="C#" %>
 <%@ Import Namespace="System.Text" %>
 <%@ Import Namespace="System.IO" %>
+<%@ Import Namespace="System.Collections.Generic" %>
 <%@ Import Namespace="GardenManager.Core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
@@ -12,23 +13,22 @@
 			bool autoRefresh = true;
 			int autoRefreshMinutes = 1;
 			int autoRefreshSeconds = 0;
-			int interval = 2;
+			int totalPoints = 0;
 
 			int[] temperatures = new int[]{};
 			int[] humidity = new int[]{};
 			int[] light = new int[]{};
 			int[] moisture = new int[]{};
 			
-			string data = "";
+			Dictionary<string, Dictionary<string, int>> data = new Dictionary<string, Dictionary<string, int>>();
 
 			void Page_Load(object sender, EventArgs e)
 			{				
 				var fileName = Server.MapPath("serialLog.txt");
 				
-				var lines = File.ReadAllText(fileName);
+				var rawData = File.ReadAllText(fileName);
 				
-				data = lines;
-
+				
 				if (!IsPostBack)
 				{
 					if (!String.IsNullOrEmpty(Request.QueryString["MaxPoints"]))
@@ -42,11 +42,14 @@
 						
 					if (!String.IsNullOrEmpty(Request.QueryString["RefSec"]))
 						autoRefreshSeconds = Convert.ToInt32(Request.QueryString["RefSec"]);
-												
-					if (!String.IsNullOrEmpty(Request.QueryString["Interval"]))
-						interval = Convert.ToInt32(Request.QueryString["Interval"]);
-
-						
+					
+					var parser = new DataLogParser();
+					parser.MaxPoints = maxPoints;
+					
+					data = parser.GetValues(rawData, "Temperature", "Humidity", "Light", "Moisture");
+					
+					totalPoints = parser.TotalPoints;
+					
 					DataBind();
 				}
 			}
@@ -54,20 +57,24 @@
 			void RefreshButton_Click(object sender, EventArgs e)
 			{
 				autoRefresh = AutoRefreshCheckBox.Checked;
-                autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
-                autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
-                maxPoints = Convert.ToInt32(MaxPointsBox.Text);
-                interval = Convert.ToInt32(IntervalBox.Text);
+				
+				if (!String.IsNullOrEmpty(RefreshMinutesBox.Text))
+                	autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
+                	
+				if (!String.IsNullOrEmpty(RefreshMinutesBox.Text))
+                	autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
                 
-                // TODO: Remove hard coding of file path
+				if (!String.IsNullOrEmpty(MaxPointsBox.Text))
+                	maxPoints = Convert.ToInt32(MaxPointsBox.Text);
+                
                 Response.Redirect(
                 	String.Format(
-                		"Default.aspx?MaxPoints={0}&AutoRef={1}&RefMin={2}&RefSec={3}&Interval={4}",
+                		"{0}?MaxPoints={1}&AutoRef={2}&RefMin={3}&RefSec={4}",
+                		Path.GetFileName(Request.PhysicalPath),
                 		maxPoints,
                 		autoRefresh,
                 		autoRefreshMinutes,
-                		autoRefreshSeconds,
-                		interval
+                		autoRefreshSeconds
                 	)
                 );
 			}
@@ -80,15 +87,11 @@
 				builder.Append("xValueType: \"dateTime\",");
 				builder.Append("dataPoints: [");
 				
-				var parser = new DataLogParser();
-
-				parser.MaxPoints = maxPoints;
-				
 				int i = 0;
 				
-				var values = parser.GetValues(data, label);
+				var currentData = data[label];
 				
-				foreach (var pair in values)
+				foreach (var pair in currentData)
 				{
 					i++;
 					
@@ -97,13 +100,11 @@
 					var jsTimeStamp = dateTime.Subtract(
 						new DateTime(1970,1,1,0,0,0))
                			.TotalMilliseconds;
-               		
-               		//var jsTimeStamp = DateTime.Now.Subtract(new DateTime(1970, 1,1)).TotalMilliseconds;
 					
 					builder.Append("{ "); 
 					builder.Append(String.Format("x: {0}, y: {1}", jsTimeStamp, pair.Value));
 					builder.Append("}");
-					if (i < values.Count)
+					if (i < currentData.Count)
 						builder.Append(",");
 					builder.Append(Environment.NewLine);
 				}
@@ -123,8 +124,7 @@
 			      },
 			      axisX: {
             		valueFormatString: ""DD-MMM HH:mm:ss"",
-			        interval:" + interval  + @",
-            		labelAngle: -70,
+            		labelAngle: -60,
 			        intervalType: ""minute""
 			      },
 			      axisY:{
@@ -237,7 +237,10 @@
 		</table>
 		<div><b>Settings:</b></div>
 		<p>
-			Maximum points:<br/>
+			Total data points available: <%= totalPoints %>
+		</p>
+		<p>
+			Maximum data points to display:<br/>
 			<span class="Desc">(The maximum number of points displayed on each graph. Choose fewer points to make the page load faster. Choose a greater number for more detail.)</span><br/>
 			<asp:TextBox runat="server" id="MaxPointsBox" text='<%# maxPoints %>'></asp:TextBox><br/>
 		</p>
@@ -246,9 +249,6 @@
 			[minutes:seconds]:
 			 <asp:TextBox runat="server" id="RefreshMinutesBox" Text='<%# autoRefreshMinutes %>' width="30"></asp:TextBox>
 			 :<asp:TextBox runat="server" id="RefreshSecondsBox" Text='<%# autoRefreshSeconds %>' width="30"></asp:TextBox>
-		</p>
-		<p>
-			Interval: <asp:TextBox runat="server" id="IntervalBox" Text='<%# interval %>' width="30"></asp:TextBox>
 		</p>
 		<p>
 			<asp:button runat="server" id="RefreshButton" text="Refresh" onclick="RefreshButton_Click" />

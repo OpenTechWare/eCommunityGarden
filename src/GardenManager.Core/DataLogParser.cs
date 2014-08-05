@@ -7,9 +7,21 @@ namespace GardenManager.Core
 	public class DataLogParser
 	{
 		public int MaxPoints = 1000;
+		public int TotalPoints = 0;
 
 		public DataLogParser ()
 		{
+		}
+		
+		public Dictionary<string, Dictionary<string, int>> GetValues(string data, params string[] labels)
+		{
+			var dict = new Dictionary<string, Dictionary<string, int>> ();
+
+			foreach (var label in labels) {
+				dict.Add (label, GetValues (data, label));
+			}
+
+			return dict;
 		}
 
 		public Dictionary<string, int> GetValues(string data, string label)
@@ -72,6 +84,8 @@ namespace GardenManager.Core
 					}	}
 				}
 			}
+
+			TotalPoints = i;
 
 			return dict;
 		}
