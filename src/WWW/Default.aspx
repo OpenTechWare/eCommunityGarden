@@ -33,8 +33,8 @@
 					if (!String.IsNullOrEmpty(Request.QueryString["MaxPoints"]))
 						maxPoints = Convert.ToInt32(Request.QueryString["MaxPoints"]);
 						
-					if (!String.IsNullOrEmpty(Request.QueryString["AutoRefresh"]))
-						autoRefresh = Convert.ToBoolean(Request.QueryString["AutoRefresh"]);
+					if (!String.IsNullOrEmpty(Request.QueryString["AutoRef"]))
+						autoRefresh = Convert.ToBoolean(Request.QueryString["AutoRef"]);
 						
 					if (!String.IsNullOrEmpty(Request.QueryString["RefMin"]))
 						autoRefreshMinutes = Convert.ToInt32(Request.QueryString["RefMin"]);
@@ -56,7 +56,7 @@
                 // TODO: Remove hard coding of file path
                 Response.Redirect(
                 	String.Format(
-                		"Default.aspx?MaxPoints={0}&Ref={1}&RefMin={2}&RefSec={3}",
+                		"Default.aspx?MaxPoints={0}&AutoRef={1}&RefMin={2}&RefSec={3}",
                 		maxPoints,
                 		autoRefresh,
                 		autoRefreshMinutes,
@@ -235,7 +235,7 @@
 			<asp:TextBox runat="server" id="MaxPointsBox" text='<%# maxPoints %>'></asp:TextBox><br/>
 		</p>
 		<p>
-			Auto refresh: <asp:CheckBox runat="server" id="AutoRefreshCheckBox" Checked="true" onclientclick="document.getElementById('RefreshButton').click();" /><br/>
+			Auto refresh: <asp:CheckBox runat="server" id="AutoRefreshCheckBox" Checked='<%# autoRefresh %>' onclientclick="document.getElementById('RefreshButton').click();" /><br/>
 			[minutes:seconds]:
 			 <asp:TextBox runat="server" id="RefreshMinutesBox" Text='<%# autoRefreshMinutes %>' width="30"></asp:TextBox>
 			 :<asp:TextBox runat="server" id="RefreshSecondsBox" Text='<%# autoRefreshSeconds %>' width="30"></asp:TextBox>
