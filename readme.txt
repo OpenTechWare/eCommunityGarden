@@ -10,6 +10,15 @@
     - Source zip file: https://github.com/OpenTechWare/GardenManager/archive/master.zip
 
 === Build and Upload Sketch ===
+ - Command line (using bash script)
+   1) Install inotool (see http://inotool.org)
+   2) Navigate to /src/ folder
+   3) Execute one of the commands:
+     a) Build:
+       sh build.sh
+     b) Build and upload to arduino
+       sh buildAndUpload.sh
+
  - Command line (using inotool)
    1) Install inotool (see http://inotool.org/)
    2) Open terminal
