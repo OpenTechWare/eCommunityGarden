@@ -2,6 +2,16 @@
 ===== GardenManager - readme =====
 ==================================
 
+=== Source Code File Strucure ===
+
+/src/
+    /Sketches/
+             /GardenMonitor/ - The GardenMonitor sketch that runs on the GardenMonitor arduino/sensors system.
+/src/
+    /WWW/                    - The ASP.NET/mono web application which displays the GardenMonitor data as graphs.
+    /GardenManager.Core/     - The GardenManager library, used by the web application (or any .NET/mono project)
+                               to parse and interact with GardenMonitor data.
+
 === Download ===
  - Git
     - Repository: https://github.com/OpenTechWare/GardenManager.git
@@ -53,6 +63,20 @@
    1) Navigate to /src/ directory in file manager/browser
    2) Open GardenManager.sln in your preferred IDE
    3) Start build
+
+=== Start Web Application
+ - Command line:
+   1) Open terminal
+   2) Navigate to /src/WWW/
+   3) Run one of the following commands:
+     a) Simple (starts on port 8080)
+       xsp4
+     b) Background process
+       screen xsp4
+     c) Public (port 80)
+       sudo xsp4 --port 80
+   4) Open via the browser
+     http://127.0.0.1:8080/
 
 === Start Serial Capture ===
 The serial capture script will capture all serial data from the connected garden monitor and save it as a "serialLog.txt" file in the /WWW/ directory. The web application uses this file to populate the graphs.
