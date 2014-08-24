@@ -20,7 +20,7 @@
 			int[] light = new int[]{};
 			int[] moisture = new int[]{};
 			
-			Dictionary<string, Dictionary<string, int>> data = new Dictionary<string, Dictionary<string, int>>();
+			Dictionary<string, Dictionary<string, double>> data = new Dictionary<string, Dictionary<string, double>>();
 
 			void Page_Load(object sender, EventArgs e)
 			{				
@@ -46,7 +46,7 @@
 					var parser = new DataLogParser();
 					parser.MaxPoints = maxPoints;
 					
-					data = parser.GetValues(rawData, "Temperature", "Humidity", "Light", "Moisture");
+					data = parser.GetValues(rawData, "Tmp", "Hm", "Lt", "Mst", "Fl");
 					
 					totalPoints = parser.TotalPoints;
 					
@@ -79,7 +79,7 @@
                 );
 			}
 		
-			string GetDataValues(string label)
+			string GetDataValues(string key)
 			{
 				var builder = new StringBuilder();
 			
@@ -89,7 +89,10 @@
 				
 				int i = 0;
 				
-				var currentData = data[label];
+				if (!data.ContainsKey(key))
+					throw new ArgumentException("No data found with the key: " + key);
+				
+				var currentData = data[key];
 				
 				foreach (var pair in currentData)
 				{
@@ -113,7 +116,7 @@
 	            		return builder.ToString();
 			}
 			
-			string GetChartScript(string label, string containerId)
+			string GetChartScript(string label, string key, string containerId)
 			{
 				var scr = @"
 			    var " + containerId + @"Chart = new CanvasJS.Chart(""" + containerId + @""",
@@ -133,7 +136,7 @@
 			      },
 			      data: [
 			      {
-			        " + GetDataValues(label) + @"
+			        " + GetDataValues(key) + @"
 			      }	 
 			      ]
 			    });
@@ -187,10 +190,11 @@
 
 			 window.onload = function () {
 			  
-			  	<%= GetChartScript("Temperature", "temperatureContainer") %>
-			  	<%= GetChartScript("Humidity", "humidityContainer") %>
-			  	<%= GetChartScript("Moisture", "moistureContainer") %>
-			  	<%= GetChartScript("Light", "lightContainer") %>
+			  	<%= GetChartScript("Temperature", "Tmp", "temperatureContainer") %>
+			  	<%= GetChartScript("Humidity", "Hm", "humidityContainer") %>
+			  	<%= GetChartScript("Moisture", "Mst", "moistureContainer") %>
+			  	<%= GetChartScript("Light", "Lt", "lightContainer") %>
+			  	<%= GetChartScript("Flow", "Fl", "flowContainer") %>
 
 				<% if (AutoRefreshCheckBox.Checked) { %>
 					beginrefresh();
@@ -230,8 +234,16 @@
 		  			</div>
 		  		</td>
 		  		<td>
+					<div id="flowContainer" style="height: 300px; width: 100%;">
+		  			</div>
+		  		</td>
+			</tr>
+			<tr>
+				<td>
 		  			<div id="humidityContainer" style="height: 300px; width: 100%;">
 		  			</div>
+		  		</td>
+		  		<td>
 		  		</td>
 			</tr>
 		</table>

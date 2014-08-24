@@ -13,29 +13,29 @@ namespace GardenManager.Core
 		{
 		}
 		
-		public Dictionary<string, Dictionary<string, int>> GetValues(string data, params string[] labels)
+		public Dictionary<string, Dictionary<string, double>> GetValues(string data, params string[] keys)
 		{
-			var dict = new Dictionary<string, Dictionary<string, int>> ();
+			var dict = new Dictionary<string, Dictionary<string, double>> ();
 
-			foreach (var label in labels) {
-				dict.Add (label, GetValues (data, label));
+			foreach (var key in keys) {
+				dict.Add (key, GetValues (data, key));
 			}
 
 			return dict;
 		}
 
-		public Dictionary<string, int> GetValues(string data, string label)
+		public Dictionary<string, double> GetValues(string data, string key)
 		{
 			var lines = data.Split (Environment.NewLine.ToCharArray(), StringSplitOptions.None);
 
-			return GetValues (lines, label);
+			return GetValues (lines, key);
 		}		
 
-		public Dictionary<string, int> GetValues(string[] dataLines, string label)
+		public Dictionary<string, double> GetValues(string[] dataLines, string key)
 		{
-			var dict = new Dictionary<string, int> ();
+			var dict = new Dictionary<string, double> ();
 
-			string fullLabel = label + ": ";
+			string fullKey = key + ":";
 
 			int interval = 1;
 
@@ -48,38 +48,41 @@ namespace GardenManager.Core
 			int i = 0;
 
 			foreach (var line in dataLines) {
-				if (!String.IsNullOrEmpty(line.Trim()))
-				{
-					// Split the line into parts using ; character
-					var parts = line.Split (';');
+				if (!String.IsNullOrEmpty (line.Trim ())) {
+					if (line.StartsWith ("D;")) {
+						// Split the line into parts using ; character
+						var parts = line.Split (';');
 
-					// If the current line starts with "Data" then parse it
-					if (parts.Length > 0
-						&& !String.IsNullOrEmpty(parts[0])
-						&& parts [0].StartsWith ("Data")) {
-						// Increment the counter
-						i++;
+						// If the current line starts with "Data" then parse it
+						if (parts.Length > 0
+							&& !String.IsNullOrEmpty (parts [0])
+							&& parts [0] == "D") {
+							// Increment the counter
+							i++;
 
-						var dateTimeString = GetDateTimeString (parts);
+							var dateTimeString = GetDateTimeString (parts);
 
-						if (!String.IsNullOrEmpty(dateTimeString.Trim()))
-						{
-							// If the current line count matches the interval (ie. the current line count
-							// is a factor of the interval with no remainder)
-							if ((i % interval) == 0) { 
-								// Loop through each part of the line
-								foreach (var part in parts) {
-									// Remove whitespace from the current part
-									var fixedPart = part.Trim ();
-									if (fixedPart.StartsWith (fullLabel)) {
-										// Parse the value as an int
-										var value = Convert.ToInt32 (
-											fixedPart.Replace (fullLabel, "").Trim ()
-										);
+							if (!String.IsNullOrEmpty (dateTimeString.Trim ())) {
+								// If the current line count matches the interval (ie. the current line count
+								// is a factor of the interval with no remainder)
+								if ((i % interval) == 0) { 
+									// Loop through each part of the line
+									foreach (var part in parts) {
+										// Remove whitespace from the current part
+										var fixedPart = part.Trim ();
+										if (fixedPart.StartsWith (fullKey)) {
+
+											var stringValue = fixedPart.Replace (fullKey, "").Trim ();
+
+											// Parse the value as an int
+											var value = Convert.ToDouble (
+												stringValue
+											);
 		
-										// Add the value to the list
-										if (!dict.ContainsKey (dateTimeString))
-											dict.Add (dateTimeString, value);
+											// Add the value to the list
+											if (!dict.ContainsKey (dateTimeString))
+												dict.Add (dateTimeString, value);
+										}
 									}
 								}
 							}
@@ -98,8 +101,8 @@ namespace GardenManager.Core
 			var output = String.Empty;
 
 			foreach (var part in lineParts) {
-				if (part.Trim().StartsWith ("DateTime"))
-					output = part.Replace ("DateTime: ", "").Trim ();
+				if (part.Trim().StartsWith("T:"))
+					output = part.Replace ("T:", "").Trim ();
 			}
 
 			return output;
