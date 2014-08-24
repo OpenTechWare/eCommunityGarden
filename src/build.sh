@@ -1,1 +1,1 @@
-xbuild /p:Configuration=Release
+xbuild GardenManager.sln /p:Configuration=Release
