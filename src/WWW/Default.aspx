@@ -26,7 +26,10 @@
 			{				
 				var fileName = Server.MapPath("serialLog.txt");
 				
-				var rawData = File.ReadAllText(fileName);
+				var rawData = "";
+				
+				if (File.Exists(fileName))
+					rawData = File.ReadAllText(fileName);
 				
 				
 				if (!IsPostBack)
@@ -56,6 +59,19 @@
 
 			void RefreshButton_Click(object sender, EventArgs e)
 			{
+				Refresh();
+			}
+			
+			void CaptureButton_Click(object sender, EventArgs e)
+			{
+				new CaptureLauncher().Start();
+			
+				Refresh();
+			}
+			
+			void Refresh()
+			{
+			
 				autoRefresh = AutoRefreshCheckBox.Checked;
 				
 				if (!String.IsNullOrEmpty(RefreshMinutesBox.Text))
@@ -264,6 +280,9 @@
 		</p>
 		<p>
 			<asp:button runat="server" id="RefreshButton" text="Refresh" onclick="RefreshButton_Click" />
+		</p>
+		<p>
+			<asp:button runat="server" id="CaptureButton" text="Start Data Capture" onclick="CaptureButton_Click" />
 		</p>
 		</form>
 	</body>
