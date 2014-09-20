@@ -283,6 +283,7 @@
 		</p>
 		<p>
 			<asp:button runat="server" id="CaptureButton" text="Start Data Capture" onclick="CaptureButton_Click" />
+			(Launches 'captureSerial.sh' script to start the serial monitor, saving all data to the 'serialLog.txt' file. This page will load that data and display it each time it refreshes.)
 		</p>
 		</form>
 	</body>
