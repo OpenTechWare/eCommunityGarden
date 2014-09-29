@@ -6,7 +6,7 @@
 
 /src/
     /Sketches/
-             /GardenMonitor/ - The GardenMonitor sketch that runs on the GardenMonitor arduino/sensors system.
+             /GardenManager/ - The GardenManager sketch that runs on the arduino/sensors system.
 /src/
     /WWW/                    - The ASP.NET/mono web application which displays the GardenMonitor data as graphs.
     /GardenManager.Core/     - The GardenManager library, used by the web application (or any .NET/mono project)
@@ -64,7 +64,7 @@
    2) Open GardenManager.sln in your preferred IDE
    3) Start build
 
-=== Start Web Application
+=== Start Web Application ===
  - Command line:
    1) Open terminal
    2) Navigate to /src/WWW/
