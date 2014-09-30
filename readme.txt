@@ -8,7 +8,7 @@
     /Sketches/
              /GardenManager/ - The GardenManager sketch that runs on the arduino/sensors system.
 /src/
-    /WWW/                    - The ASP.NET/mono web application which displays the GardenMonitor data as graphs.
+    /WWW/                    - The ASP.NET/mono web application which displays the GardenManager data as graphs.
     /GardenManager.Core/     - The GardenManager library, used by the web application (or any .NET/mono project)
                                to parse and interact with GardenMonitor data.
 
