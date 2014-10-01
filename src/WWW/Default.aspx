@@ -65,6 +65,8 @@
 			void CaptureButton_Click(object sender, EventArgs e)
 			{
 				new CaptureStarter().Start();
+				
+				Application["IsCapturing"] = true;
 			
 				Refresh();
 			}
@@ -114,15 +116,28 @@
 				{
 					i++;
 					
-					var dateTime = DateTime.Parse(pair.Key);
-					
-					var jsTimeStamp = dateTime.Subtract(
-						new DateTime(1970,1,1,0,0,0))
-               			.TotalMilliseconds;
+					var dateTime = DateTime.Now.AddSeconds(i);
 					
 					builder.Append("{ "); 
-					builder.Append(String.Format("x: {0}, y: {1}", jsTimeStamp, pair.Value));
+					
+					try
+					{
+						dateTime = DateTime.Parse(pair.Key);
+						
+						var jsTimeStamp = dateTime.Subtract(
+							new DateTime(1970,1,1,0,0,0))
+	               			.TotalMilliseconds;
+						
+						builder.Append(String.Format("x: {0}, y: {1}", jsTimeStamp, pair.Value));
+					}
+					catch (Exception ex)
+					{
+						builder.Append(String.Format("x: {0}, y: {1}", i, pair.Value));
+					//throw ex;
+					}
+					
 					builder.Append("}");
+					
 					if (i < currentData.Count)
 						builder.Append(",");
 					builder.Append(Environment.NewLine);
@@ -282,7 +297,8 @@
 			<asp:button runat="server" id="RefreshButton" text="Refresh" onclick="RefreshButton_Click" />
 		</p>
 		<p>
-			<asp:button runat="server" id="CaptureButton" text="Start Data Capture" onclick="CaptureButton_Click" />
+			Data capture running: <%= (bool)Application["IsCapturing"] ? "Yes" : "No" %><br/>
+			<asp:button runat="server" id="CaptureButton" text="Start Data Capture" onclick="CaptureButton_Click" Enabled='<%# (bool)Application["IsCapturing"] == false %>'/><br/>
 			(Launches 'captureSerial.sh' script to start the serial monitor, saving all data to the 'serialLog.txt' file. This page will load that data and display it each time it refreshes.)
 		</p>
 		</form>
