@@ -297,9 +297,9 @@
 			<asp:button runat="server" id="RefreshButton" text="Refresh" onclick="RefreshButton_Click" />
 		</p>
 		<p>
-			Data capture running: <%= (bool)Application["IsCapturing"] ? "Yes" : "No" %><br/>
-			<asp:button runat="server" id="CaptureButton" text="Start Data Capture" onclick="CaptureButton_Click" Enabled='<%# (bool)Application["IsCapturing"] == false %>'/><br/>
-			(Launches 'captureSerial.sh' script to start the serial monitor, saving all data to the 'serialLog.txt' file. This page will load that data and display it each time it refreshes.)
+			Data capture running: <%= Application["IsCapturing"] != null && (bool)Application["IsCapturing"] ? "Yes" : "No" %><br/>
+			<asp:button runat="server" id="CaptureButton" text="Start Data Capture" onclick="CaptureButton_Click" Enabled='<%# Application["IsCapturing"] == null || (bool)Application["IsCapturing"] == false %>'/><br/>
+			<span class="Desc">(Launches 'captureSerial.sh' script to start the serial monitor, saving all data to the 'serialLog.txt' file. This page will load that data and display it each time it refreshes.)</span>
 		</p>
 		</form>
 	</body>

@@ -18,7 +18,7 @@ int powerLedPin       = 14;
 int errorPin          = 16;
 
 // Set the delay between each loop (in milliseconds)
-int delayTime = 5000;
+int delayTime = 2000;
 
 
 void setup() //
