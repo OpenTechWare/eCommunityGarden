@@ -19,9 +19,19 @@
  - Direct download
     - Source zip file: https://github.com/OpenTechWare/GardenManager/archive/master.zip
 
+=== Install inotool ===
+(See http://inotool.org for more information)
+ - On Debian/Ubuntu Linux (including Raspbian) run these terminal commands: 
+  sudo apt-get install arduino python-configobj python-setuptools git python-jinja2 python-serial python-pip
+  sudo pip install glob2
+  sudo apt-get install picocom
+  git clone git://github.com/amperka/ino.git
+  cd ino
+  sudo make install
+
 === Build and Upload Sketch ===
- - Command line (using bash script)
-   1) Install inotool (see http://inotool.org)
+ - Command line (using bash script and inotool)
+   1) Install inotool (see above)
    2) Navigate to /src/ folder
    3) Execute one of the commands:
      a) Build:
@@ -30,9 +40,9 @@
        sh buildAndUpload.sh
 
  - Command line (using inotool)
-   1) Install inotool (see http://inotool.org/)
+   1) Install inotool (see above)
    2) Open terminal
-   3) Navigate to /src/Sketches/GardenMonitor/
+   3) Navigate to /src/Sketches/GardenManager/
    4) Type one of the following commands to build sketch:
       a) Basic
         ino build 
