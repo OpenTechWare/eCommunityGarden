@@ -21,13 +21,13 @@
 
 === Install inotool ===
 (See http://inotool.org for more information)
- - On Debian/Ubuntu Linux (including Raspbian) run these terminal commands: 
-  sudo apt-get install arduino python-configobj python-setuptools git python-jinja2 python-serial python-pip
-  sudo pip install glob2
-  sudo apt-get install picocom
-  git clone git://github.com/amperka/ino.git
-  cd ino
-  sudo make install
+ - On Debian/Ubuntu Linux (including Raspbian) run these terminal commands (one line at a time): 
+   sudo apt-get install arduino python-configobj python-setuptools git python-jinja2 python-serial python-pip
+   sudo pip install glob2
+   sudo apt-get install picocom
+   git clone git://github.com/amperka/ino.git
+   cd ino
+   sudo make install
 
 === Build and Upload Sketch ===
  - Command line (using bash script and inotool)
@@ -60,6 +60,9 @@
         CTRL + Q     
 
 === Build Web Application ===
+ - Bash script
+   1) On a Debian/Ubuntu linux OS (including Raspbian) run this command:
+      sh build.sh
  - xbuild
    1) Open terminal
    2) Navigate to /src/ directory
