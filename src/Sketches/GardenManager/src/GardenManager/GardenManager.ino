@@ -45,6 +45,9 @@ void setupGardenManager()
 
   // Initialize the irrigation
   initIrrigation();
+  
+  // Initialize the light sensor and light control
+  initLight();
 
   // Declare output pins
   pinMode(powerLedPin, OUTPUT);  
@@ -56,7 +59,11 @@ void setupGardenManager()
 
 void loopGardenManager()
 {
+  logStart();
+  
   char* dateTime = getTime();
+  
+  logStringValue("T", dateTime);
   
   float flowRateValue = getFlowRate();
   
@@ -70,8 +77,6 @@ void loopGardenManager()
   
   float humidityValue = getHumidityValue();
 
-  logStart();
-  logStringValue("T", dateTime);
   logIntValue("Mst", moistureValue);
   logIntValue("Lt", lightValue);
   logFloatValue("Hm", humidityValue, 1);
