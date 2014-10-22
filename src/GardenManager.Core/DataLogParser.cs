@@ -33,6 +33,8 @@ namespace GardenManager.Core
 
 		public Dictionary<string, double> GetValues(string[] dataLines, string key)
 		{
+			// TODO: Reorganize this function and break up the mess of code into smaller bits/functions
+
 			var dict = new Dictionary<string, double> ();
 
 			string fullKey = key + ":";
@@ -78,10 +80,19 @@ namespace GardenManager.Core
 											var value = Convert.ToDouble (
 												stringValue
 											);
-		
+
+											var yearString = dateTimeString.Substring (0, dateTimeString.IndexOf ("-"));
+											var year = Convert.ToInt32 (yearString);
+
+											// If the year is less than 2150 then it's a valid date time string (if it's above that it's a false value indicating the RTC module isn't plugged in)
+											bool isValidDate = year < 2150;
+
+											// Create the key (date if it's valid, or index if the date is invalid)
+											var newKey = isValidDate ? dateTimeString : i.ToString();
+
 											// Add the value to the list
-											if (!dict.ContainsKey (dateTimeString))
-												dict.Add (dateTimeString, value);
+											if (!dict.ContainsKey (newKey))
+												dict.Add (newKey, value);
 										}
 									}
 								}
