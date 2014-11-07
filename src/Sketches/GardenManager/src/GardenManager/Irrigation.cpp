@@ -9,6 +9,7 @@ int wateringLedPin    = 15;
 
 // Output pins
 int wateringPin       = 9;
+int wateringLowPin       = 8;
 
 void checkIrrigation()
 {
