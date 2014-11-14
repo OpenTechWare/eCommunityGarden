@@ -84,9 +84,10 @@ void loopGardenManager()
   logFloatValue("Hm", humidityValue, 1);
   logFloatValue("Tmp", temperatureValue, 1);
   logFloatValue("Fl", flowRateValue, 4);
-  logFinish();
 
   checkIrrigation();
+  
+  logFinish();
   
   delay(delayTime);
 }
