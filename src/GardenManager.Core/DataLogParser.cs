@@ -46,8 +46,9 @@ namespace GardenManager.Core
 
 			// Define a counter for the current line
 			int i = 0;
+			int z = dataLines.Length-1;
 
-			foreach (var line in dataLines) {
+			foreach (var line in dataLines) { // TODO: Clean up
 				if (!String.IsNullOrEmpty (line.Trim ())) {
 					if (line.StartsWith ("D;")) {
 						// Split the line into parts using ; character
@@ -59,13 +60,17 @@ namespace GardenManager.Core
 							&& parts [0] == "D") {
 							// Increment the counter
 							i++;
+							
+							// Decrement the z counter
+							z--;
 
 							var dateTimeString = GetDateTimeString (parts);
 
 							if (!String.IsNullOrEmpty (dateTimeString.Trim ())) {
 								// If the current line count matches the interval (ie. the current line count
 								// is a factor of the interval with no remainder)
-								if ((i % interval) == 0) { 
+								// Note: The z variable goes backwards to ensure it includes the latest data, to reduce delay
+								if ((z % interval) == 0) { 
 									// Loop through each part of the line
 									foreach (var part in parts) {
 										// Remove whitespace from the current part
