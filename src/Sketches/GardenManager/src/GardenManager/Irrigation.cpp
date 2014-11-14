@@ -18,11 +18,13 @@ void checkIrrigation()
   if (moistureValue < threshold)
   {
     digitalWrite(wateringPin, HIGH);
+    digitalWrite(wateringLowPin, LOW);
     digitalWrite(wateringLedPin, HIGH);
   }
   else
   {
     digitalWrite(wateringPin, LOW);
+    digitalWrite(wateringLowPin, HIGH);
     digitalWrite(wateringLedPin, LOW);
   }
 }

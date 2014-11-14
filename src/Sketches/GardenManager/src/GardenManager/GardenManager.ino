@@ -1,3 +1,5 @@
+#include <SPI.h>
+
 #include "Arduino.h"
 
 #include <SD.h>

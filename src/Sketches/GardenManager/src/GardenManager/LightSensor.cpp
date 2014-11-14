@@ -10,15 +10,17 @@ int lightValueLow          = 0;
 // Declare the pin that measures light levels
 int lightSensorPin = A3;
 
+// Disabled to use the pin for latching relay low signal
 // Declare the pin that controls grow lights
-//int lightControlPin = 8; // Disabled due to latching relay
+//int lightControlPin = 8; 
 
 // Declare the minimum light level, at which lower levels will turn on grow lights
 int lightControlThreshold = 80;
 
 void initLight()
 {
-  pinMode(lightControlPin, OUTPUT);
+  // Disabled to use the pin for latching relay low signal
+//  pinMode(lightControlPin, OUTPUT);
 }
   
 int getLightValue()
@@ -33,7 +35,8 @@ int getLightValue()
     lightOutputValue == 0;
   
   logIntValue("LtOut", lightOutputValue);
-  
+
+  // Disabled to use the pin for latching relay low signal  
   // If light levels are low, turn on the grow lights
   /*if (value < lightControlThreshold)
     analogWrite(lightControlPin, lightOutputValue);
