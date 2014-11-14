@@ -2,7 +2,7 @@
 ===== GardenManager - readme =====
 ==================================
 
-=== Source Code File Strucure ===
+=== Source Code File Structure ===
 
 /src/
     /Sketches/
