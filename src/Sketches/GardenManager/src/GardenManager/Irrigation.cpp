@@ -5,7 +5,7 @@
 int threshold         = 20; // The minimum soil moisture level, before switching on the irrigation.
 
 // LED pins
-int wateringLedPin    = 15;
+int wateringAltPin    = 15;
 
 // Output pins
 int wateringPin       = 9;
@@ -19,18 +19,19 @@ void checkIrrigation()
   {
     digitalWrite(wateringPin, HIGH);
     digitalWrite(wateringLowPin, LOW);
-    digitalWrite(wateringLedPin, HIGH);
+    digitalWrite(wateringAltPin, HIGH);
   }
   else
   {
     digitalWrite(wateringPin, LOW);
     digitalWrite(wateringLowPin, HIGH);
-    digitalWrite(wateringLedPin, LOW);
+    digitalWrite(wateringAltPin, LOW);
   }
 }
 
 void initIrrigation()
 {
   pinMode(wateringPin, OUTPUT); 
-  pinMode(wateringLedPin, OUTPUT);  
+  pinMode(wateringAltPin, OUTPUT); 
+  pinMode(wateringLowPin, OUTPUT);  
 }
