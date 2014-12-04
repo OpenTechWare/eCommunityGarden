@@ -107,3 +107,5 @@ While the serial capture script is running and the garden monitor is connected t
     5) To exit serial monitor press the following two key combinations (without releasing the CTRL key)
         CTRL + A
         CTRL + Q     
+
+[ ![Codeship Status for OpenTechWare/GardenManager](https://codeship.com/projects/9268d490-5e3d-0132-feca-5a8b1698743a/status)](https://codeship.com/projects/51303)
