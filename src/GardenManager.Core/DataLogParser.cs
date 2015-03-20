@@ -20,6 +20,15 @@ namespace GardenManager.Core
 			}
 			return dict;
 		}
+
+		/*public Dictionary<string, Dictionary<string, double>> GetLatestValues(int positions, string data, params string[] keys)
+		{
+			var dict = new Dictionary<string, Dictionary<string, double>> ();
+			foreach (var key in keys) {
+				dict.Add (key, GetValues (data, key));
+			}
+			return dict;
+		}*/
 		public Dictionary<string, double> GetValues(string data, string key)
 		{
 			var lines = data.Split (Environment.NewLine.ToCharArray(), StringSplitOptions.None);
