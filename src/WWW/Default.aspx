@@ -7,11 +7,6 @@
 <head>
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<script runat="server">
-		
-			int[] temperatures = new int[]{};
-			int[] humidity = new int[]{};
-			int[] light = new int[]{};
-			int[] moisture = new int[]{};
 
 			int maxPoints = 10000;
 			int totalPoints = 0;
