@@ -39,11 +39,9 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="web.config" />
-    <Content Include="Default.aspx" />
-    <Content Include="Index.aspx" />
     <Content Include="Graph.aspx" />
     <Content Include="style.css" />
-    <Content Include="Index2.aspx" />
+    <Content Include="Default.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.asax.cs">

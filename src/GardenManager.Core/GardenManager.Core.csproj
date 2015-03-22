@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{CC78FFAC-1B2C-4CEF-B636-9082DD9EFCF5}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -30,6 +30,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="Sider">
+      <HintPath>..\..\..\..\learn\Redis\lib\Sider.0.9.3\lib\net40-Client\Sider.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -37,6 +40,8 @@
       <DependentUpon>DataLogParser.bak_cs</DependentUpon>
     </Compile>
     <Compile Include="CaptureStarter.cs" />
+    <Compile Include="DataStore.cs" />
+    <Compile Include="DataConversion.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

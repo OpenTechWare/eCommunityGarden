@@ -20,19 +20,12 @@
 				sensorKey = Request.QueryString["k"];
 				sensorTitle = Request.QueryString["t"];
 
-				var fileName = Server.MapPath("serialLog.txt");
-				
-				var rawData = "";
-				
-				if (File.Exists(fileName))
-					rawData = File.ReadAllText(fileName).Trim();
+				var conversion = new DataConversion();
+				conversion.ConvertFileToData();
 
-				var parser = new DataLogParser();
-				parser.MaxPoints = maxPoints;
-				
-				data = parser.GetValues(rawData, new string[] {sensorKey});//"Tmp", "Hm", "Lt", "Mst", "Fl");
+				var store = new DataStore();
 
-				totalPoints = parser.TotalPoints;
+				data.Add(sensorKey, store.GetValues(sensorKey));
 			}
 
 			string getDataScript(string key, string id)

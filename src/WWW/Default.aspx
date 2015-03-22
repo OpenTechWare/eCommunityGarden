@@ -1,306 +1,199 @@
 <%@ Page Language="C#" %>
-<%@ Import Namespace="System.Text" %>
-<%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="System.Collections.Generic" %>
+<%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="GardenManager.Core" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html>
-	<head runat="server">
-		<title>Garden Monitor - Charts</title>
-		<script runat="server">
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script runat="server">
 		
-			int maxPoints = 100;
-			bool autoRefresh = true;
-			int autoRefreshMinutes = 1;
-			int autoRefreshSeconds = 0;
-			int totalPoints = 0;
-
 			int[] temperatures = new int[]{};
 			int[] humidity = new int[]{};
 			int[] light = new int[]{};
 			int[] moisture = new int[]{};
+
+			int maxPoints = 10000;
+			int totalPoints = 0;
 			
 			Dictionary<string, Dictionary<string, double>> data = new Dictionary<string, Dictionary<string, double>>();
 
 			void Page_Load(object sender, EventArgs e)
-			{				
-				var fileName = Server.MapPath("serialLog.txt");
-				
-				var rawData = "";
-				
-				if (File.Exists(fileName))
-					rawData = File.ReadAllText(fileName);
-				
-				
-				if (!IsPostBack)
-				{
-					if (!String.IsNullOrEmpty(Request.QueryString["MaxPoints"]))
-						maxPoints = Convert.ToInt32(Request.QueryString["MaxPoints"]);
-						
-					if (!String.IsNullOrEmpty(Request.QueryString["AutoRef"]))
-						autoRefresh = Convert.ToBoolean(Request.QueryString["AutoRef"]);
-						
-					if (!String.IsNullOrEmpty(Request.QueryString["RefMin"]))
-						autoRefreshMinutes = Convert.ToInt32(Request.QueryString["RefMin"]);
-						
-					if (!String.IsNullOrEmpty(Request.QueryString["RefSec"]))
-						autoRefreshSeconds = Convert.ToInt32(Request.QueryString["RefSec"]);
-					
-					var parser = new DataLogParser();
-					parser.MaxPoints = maxPoints;
-					
-					data = parser.GetValues(rawData, "Tmp", "Hm", "Lt", "Mst", "Fl");
-					
-					totalPoints = parser.TotalPoints;
-					
-					DataBind();
-				}
+			{
+
+				var keys = new string[]{ "Tmp", "Hm", "Lt", "Mst", "Fl" };
+
+				var conversion = new DataConversion();
+				conversion.ConvertFileToData();
+
+				var store = new DataStore();
+
+				foreach (var key in keys)
+					data.Add(key, store.GetValues(key));
+
+				//totalPoints = parser.TotalPoints;
 			}
 
-			void RefreshButton_Click(object sender, EventArgs e)
+			string getDataScript(string key, string id)
 			{
-				Refresh();
-			}
-			
-			void CaptureButton_Click(object sender, EventArgs e)
-			{
-				new CaptureStarter().Start();
-				
-				Application["IsCapturing"] = true;
-			
-				Refresh();
-			}
-			
-			void Refresh()
-			{
-			
-				autoRefresh = AutoRefreshCheckBox.Checked;
-				
-				if (!String.IsNullOrEmpty(RefreshMinutesBox.Text))
-                	autoRefreshMinutes = Convert.ToInt32(RefreshMinutesBox.Text);
-                	
-				if (!String.IsNullOrEmpty(RefreshMinutesBox.Text))
-                	autoRefreshSeconds = Convert.ToInt32(RefreshSecondsBox.Text);
-                
-				if (!String.IsNullOrEmpty(MaxPointsBox.Text))
-                	maxPoints = Convert.ToInt32(MaxPointsBox.Text);
-                
-                Response.Redirect(
-                	String.Format(
-                		"{0}?MaxPoints={1}&AutoRef={2}&RefMin={3}&RefSec={4}",
-                		Path.GetFileName(Request.PhysicalPath),
-                		maxPoints,
-                		autoRefresh,
-                		autoRefreshMinutes,
-                		autoRefreshSeconds
-                	)
-                );
-			}
-		
-			string GetDataValues(string key)
-			{
-				var builder = new StringBuilder();
-			
-				builder.Append("type: \"line\",");
-				builder.Append("xValueType: \"dateTime\",");
-				builder.Append("dataPoints: [");
-				
+				var color = "lightblue";
+
+				switch (key)
+				{
+					case "Tmp":
+						color = "darkred";
+						break;
+					case "Lt":
+						color = "orange";
+						break;
+					case "Hm":
+						color = "green";
+						break;
+					case "Mst":
+						color = "navy";
+						break;
+				}
+
+				var data = getLatestData(key);
+
 				int i = 0;
-				
-				if (!data.ContainsKey(key))
-					throw new ArgumentException("No data found with the key: " + key);
-				
-				var currentData = data[key];
-				
-				foreach (var pair in currentData)
+				var builder = new StringBuilder();
+				builder.AppendLine(
+@"<canvas id=""" + id + @""" width=""150"" height=""230"" style=""float:right""></canvas>"
+				);
+				builder.AppendLine("<script>");
+				builder.AppendLine("var " + id + @"Data = {");
+          		builder.Append("	labels : [");
+				foreach (var t in data.Keys)
 				{
-					i++;
-					
-					var dateTime = DateTime.Now.AddSeconds(i);
-					
-					builder.Append("{ "); 
-					
-					try
-					{
-						dateTime = DateTime.Parse(pair.Key);
-						
-						var jsTimeStamp = dateTime.Subtract(
-							new DateTime(1970,1,1,0,0,0))
-	               			.TotalMilliseconds;
-						
-						builder.Append(String.Format("x: {0}, y: {1}", jsTimeStamp, pair.Value));
-					}
-					catch (Exception ex)
-					{
-						builder.Append(String.Format("x: {0}, y: {1}", i, pair.Value));
-					//throw ex;
-					}
-					
-					builder.Append("}");
-					
-					if (i < currentData.Count)
+					builder.Append("\"");
+          			builder.Append("");
+          			//builder.Append(DateTime.Parse(t).ToShortTimeString());
+					builder.Append("\"");
+					if (i < data.Count-1)
 						builder.Append(",");
-					builder.Append(Environment.NewLine);
+
+					i++;
 				}
-				
-				builder.Append("]");
-	            		return builder.ToString();
+
+          		builder.Append(@"],
+	datasets : [
+              	{
+                  fillColor : """ + color + @""",
+                  strokeColor : """ + color + @""",
+                  ");
+
+				builder.Append("data : [");
+				i=0;
+				foreach (var t in data.Keys)
+				{
+					builder.Append(data[t]);
+					if (i < data.Count-1)
+						builder.Append(",");
+
+					i++;
+				}
+				builder.Append(@"]
+              }
+          ]
+      }
+
+      var options = {      
+        scaleOverride: true,
+        scaleSteps: 10,
+        scaleStepWidth: Math.ceil(100 / 10),
+        scaleStartValue: 0
+      };
+
+      // get bar chart canvas
+      var " + id + @" = document.getElementById(""" + id + @""").getContext(""2d"");
+      // draw bar chart
+      new Chart(" + id + @").Line(" + id + @"Data, options);");
+      builder.AppendLine("<" + "/script>");
+
+				return builder.ToString();
 			}
-			
-			string GetChartScript(string label, string key, string containerId)
+
+			Dictionary<string, double> getLatestData(string key)
 			{
-				var scr = @"
-			    var " + containerId + @"Chart = new CanvasJS.Chart(""" + containerId + @""",
-			    {
-			      theme: ""theme2"",
-			      title:{
-			        text: """ + label + @"""
-			      },
-			      axisX: {
-            		valueFormatString: ""DD-MMM HH:mm:ss"",
-            		labelAngle: -60,
-			        intervalType: ""minute""
-			      },
-			      axisY:{
-			        includeZero: true
-			        
-			      },
-			      data: [
-			      {
-			        " + GetDataValues(key) + @"
-			      }	 
-			      ]
-			    });
-			    
-				" + containerId + "Chart.render();";
+				var selectedData = data[key];
+
+				var latestData = new Dictionary<string, double>();
+
+				int i = selectedData.Keys.Count;
+				if (data.Count > 0)
+				{
+					foreach (var t in selectedData.Keys)
+					{
+						if (i <= 3)
+						{
+							latestData.Add(t, selectedData[t]);
+						}
+
+						i--;
+					}
+				}
+				return latestData;
+			}
 				
-				return scr;
-			}
+		double getLatestValue(string sensorKey)
+		{
+			double val = 0;
 
-			string GetRefreshScript()
+			foreach (var timeKey in data[sensorKey].Keys)
 			{
-				var scr = @"
-	                // Auto Refresh Page with Time script
-	    	        // By JavaScript Kit (javascriptkit.com)
-	            	// Over 200+ free scripts here
-
-	                //enter refresh time in ""minutes:seconds"" Minutes should range from 0 to inifinity. Seconds should range from 0 to 59
-	    	        var limit='" + autoRefreshMinutes + ":" + autoRefreshSeconds + @"';
-
-	                if (document.images){
-	    	                var parselimit=limit.split("":"")
-	            	        parselimit=parselimit[0]*60+parselimit[1]*1
-	            }
-
-	                function beginrefresh(){
-	   	        	        if (!document.images)
-	           		                return
-	                        if (parselimit==1)
-	                                document.getElementById('RefreshButton').click();
-	    	                else{
-	           	                	parselimit-=1
-	                   		        curmin=Math.floor(parselimit/60)
-	                    	        cursec=parselimit%60
-	            	                if (curmin!=0)
-	    	                                curtime=curmin+"" minutes and ""+cursec+"" seconds left until page refresh!""
-	                                else
-	                                        curtime=cursec+"" seconds left until page refresh!""
-	                    	        window.status=curtime
-	            	                setTimeout(""beginrefresh()"",1000)
-	    	                }
-	                }";
-
-				return scr;
-			}
-		</script>
-        <script src="js/canvasjs/canvasjs.min.js"></script>
-        <script>
-            <% if (AutoRefreshCheckBox.Checked) { %>
-            	<%= GetRefreshScript() %>
-            <% } %>
-
-			 window.onload = function () {
-			  
-			  	<%= GetChartScript("Temperature", "Tmp", "temperatureContainer") %>
-			  	<%= GetChartScript("Humidity", "Hm", "humidityContainer") %>
-			  	<%= GetChartScript("Moisture", "Mst", "moistureContainer") %>
-			  	<%= GetChartScript("Light", "Lt", "lightContainer") %>
-			  	<%= GetChartScript("Flow", "Fl", "flowContainer") %>
-
-				<% if (AutoRefreshCheckBox.Checked) { %>
-					beginrefresh();
-				<% } %>
+				val = data[sensorKey][timeKey];
 			}
 
-
-        </script>
-	<style>
-	body
-	{
-		font-family: Verdana;
-	}
-
-	.Desc
-	{
-		font-size: 10px;
-	}
-	</style>
-	</head>
-	<body>
-		<form id="form1" runat="server">
-		<table width="100%">
-			<tr>
-				<td>
-					<div id="lightContainer" style="height: 300px; width: 100%;">
-		  			</div>
-		  		</td>
-		  		<td>
-		  			<div id="moistureContainer" style="height: 300px; width: 100%;">
-		  			</div>
-		  		</td>
-			</tr>
-			<tr>
-				<td>
-					<div id="temperatureContainer" style="height: 300px; width: 100%;">
-		  			</div>
-		  		</td>
-		  		<td>
-					<div id="flowContainer" style="height: 300px; width: 100%;">
-		  			</div>
-		  		</td>
-			</tr>
-			<tr>
-				<td>
-		  			<div id="humidityContainer" style="height: 300px; width: 100%;">
-		  			</div>
-		  		</td>
-		  		<td>
-		  		</td>
-			</tr>
-		</table>
-		<div><b>Settings:</b></div>
-		<p>
-			Total data points available: <%= totalPoints %>
-		</p>
-		<p>
-			Maximum data points to display:<br/>
-			<span class="Desc">(The maximum number of points displayed on each graph. Choose fewer points to make the page load faster. Choose a greater number for more detail.)</span><br/>
-			<asp:TextBox runat="server" id="MaxPointsBox" text='<%# maxPoints %>'></asp:TextBox><br/>
-		</p>
-		<p>
-			Auto refresh: <asp:CheckBox runat="server" id="AutoRefreshCheckBox" Checked='<%# autoRefresh %>' onclientclick="document.getElementById('RefreshButton').click();" /><br/>
-			[minutes:seconds]:
-			 <asp:TextBox runat="server" id="RefreshMinutesBox" Text='<%# autoRefreshMinutes %>' width="30"></asp:TextBox>
-			 :<asp:TextBox runat="server" id="RefreshSecondsBox" Text='<%# autoRefreshSeconds %>' width="30"></asp:TextBox>
-		</p>
-		<p>
-			<asp:button runat="server" id="RefreshButton" text="Refresh" onclick="RefreshButton_Click" />
-		</p>
-		<p>
-			Data capture running: <%= Application["IsCapturing"] != null && (bool)Application["IsCapturing"] ? "Yes" : "No" %><br/>
-			<asp:button runat="server" id="CaptureButton" text="Start Data Capture" onclick="CaptureButton_Click" Enabled='<%# Application["IsCapturing"] == null || (bool)Application["IsCapturing"] == false %>'/><br/>
-			<span class="Desc">(Launches 'captureSerial.sh' script to start the serial monitor, saving all data to the 'serialLog.txt' file. This page will load that data and display it each time it refreshes.)</span>
-		</p>
-		</form>
-	</body>
+			return val;
+		}
+	</script>
+    <script type="text/javascript" src='Chart.min.js'></script>
+    <script type="text/javascript" src='jquery-2.1.3.min.js'></script>
+</head>
+<body>
+<script type="text/javascript">
+$(document).ready(
+  function() {
+    var colorOrig=$('.pnl').css('background-color');
+    $('.pnl').hover(
+    function() {
+        //mouse over
+        $(this).css('background', 'lightgray');
+    }, function() {
+        //mouse out
+        $(this).css('background', colorOrig);
+    });
+}); 
+</script>
+<div class="buttons">
+	<div class="ref button" onclick="window.location.reload()">
+  		Refresh
+	</div>
+</div>
+	<div class="panels">
+		<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Tmp&t=Temperature';">
+		  <div class="hd">Temperature</div>
+		  <%= getDataScript("Tmp", "temperature") %>
+		  <div class="bdy">
+		    <span class="lval"><%= getLatestValue("Tmp") %>c</span>
+		  </div>
+		</div>
+		<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Hm&t=Humidity';">
+		<div class="hd">Humidity</div>
+		  <%= getDataScript("Hm", "humidity") %>
+		  <div class="bdy"><span class="lval"><%= getLatestValue("Hm") %>%</span></div>
+		</div>
+		<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Lt&t=Light';">
+		<div class="hd">Light</div>
+		  <%= getDataScript("Lt", "light") %>
+		  <div class="bdy"><span class="lval"><%= getLatestValue("Lt") %>%</span></div>
+		</div>
+		<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Mst&t=Soil+Moisture';">
+		<div class="hd">Soil Moisture</div>
+		  <%= getDataScript("Mst", "moisture") %>
+		  <div class="bdy"><span class="lval"><%= getLatestValue("Mst") %>%</span></div>
+		</div>
+  </div>
+</body>
 </html>
