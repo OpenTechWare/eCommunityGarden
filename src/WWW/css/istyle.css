@@ -1,0 +1,86 @@
+
+
+.row
+{
+  /*border: solid 1px lightblue;*/
+  height: 120px;
+  margin: 10px;
+}
+
+/* Mini panel */
+.mpnl
+{
+  border: solid 1px lightblue;
+  width: 110px;
+  height: 100px;
+  margin: 10px;
+  cursor: pointer;
+  float: left;
+  font-size: 11px;
+  font-family: verdana;
+}
+
+/* Medium latest value */
+.mval
+{
+  font-size: 18px;
+  font-family: Verdana;
+  color: gray;
+  margin: 3px;
+  margin-top: 80px;
+}
+
+.rowlbl
+{
+
+  /*height: 30px;*/
+   /*padding: 3px 10px 0px 10px;*/
+  color: gray;
+  font-weight: bold;
+  font-family: Verdana;
+  float: left;
+  padding: 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.mgrph
+{
+	margin: 5px;
+}
+
+.shd
+{
+  background-color: lightblue;
+  font-weight: bold;
+  color: gray;
+  padding: 3px;
+}
+
+.rhd
+{
+	font-weight: bold;
+	color: gray;
+	font-size: 18px;
+}
+
+.desc
+{
+	font-size: 12px;
+}
+
+.rowbtn
+{
+	float: left;
+	padding: 13px;
+	color: gray;
+	font-family: Verdana;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.rowbtn a
+{
+	color: blue;
+	font-weight: normal;
+}

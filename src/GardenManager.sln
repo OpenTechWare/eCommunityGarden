@@ -5,12 +5,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenManager.WWW", "WWW\Ga
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenManager.Core", "GardenManager.Core\GardenManager.Core.csproj", "{CC78FFAC-1B2C-4CEF-B636-9082DD9EFCF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenManager.Core.Tests", "GardenManager.Core.Tests\GardenManager.Core.Tests.csproj", "{2D48D9DD-D886-42D4-B7B3-F63D6D34EE88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GardenManager.Web.UI", "GardenManager.Web.UI\GardenManager.Web.UI.csproj", "{6F7FF05D-40A4-48AD-A2F5-4EDCD7CC22EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D48D9DD-D886-42D4-B7B3-F63D6D34EE88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D48D9DD-D886-42D4-B7B3-F63D6D34EE88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D48D9DD-D886-42D4-B7B3-F63D6D34EE88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D48D9DD-D886-42D4-B7B3-F63D6D34EE88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F7FF05D-40A4-48AD-A2F5-4EDCD7CC22EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F7FF05D-40A4-48AD-A2F5-4EDCD7CC22EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F7FF05D-40A4-48AD-A2F5-4EDCD7CC22EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F7FF05D-40A4-48AD-A2F5-4EDCD7CC22EC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CC78FFAC-1B2C-4CEF-B636-9082DD9EFCF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CC78FFAC-1B2C-4CEF-B636-9082DD9EFCF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC78FFAC-1B2C-4CEF-B636-9082DD9EFCF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -19,8 +31,5 @@ Global
 		{D00ACAFC-7264-48FE-96F3-15369DF4D49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D00ACAFC-7264-48FE-96F3-15369DF4D49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D00ACAFC-7264-48FE-96F3-15369DF4D49F}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = WWW\GardenManager.WWW.csproj
 	EndGlobalSection
 EndGlobal

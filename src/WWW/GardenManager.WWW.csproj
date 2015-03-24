@@ -3,13 +3,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{D00ACAFC-7264-48FE-96F3-15369DF4D49F}</ProjectGuid>
     <ProjectTypeGuids>{349C5851-65DF-11DA-9384-00065B846F21};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>GardenManager</RootNamespace>
     <AssemblyName>GardenManager</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,7 +40,16 @@
   <ItemGroup>
     <Content Include="Global.asax" />
     <Content Include="web.config" />
+    <Content Include="Graph.aspx" />
+    <Content Include="Data.aspx" />
+    <Content Include="script.js" />
+    <Content Include="Device.aspx" />
     <Content Include="Default.aspx" />
+    <Content Include="css\dstyle.css" />
+    <Content Include="css\istyle.css" />
+    <Content Include="css\style.css" />
+    <Content Include="css\gstyle.css" />
+    <Content Include="EditDevice.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.asax.cs">
@@ -51,7 +61,7 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
   <ProjectExtensions>
     <MonoDevelop>
-      <Properties VerifyCodeBehindFields="True" VerifyCodeBehindEvents="True">
+      <Properties>
         <XspParameters Port="8081" Address="127.0.0.1" SslMode="None" SslProtocol="Default" KeyType="None" CertFile="" KeyFile="" PasswordOptions="None" Password="" Verbose="True" />
       </Properties>
     </MonoDevelop>
@@ -61,5 +71,15 @@
       <Project>{CC78FFAC-1B2C-4CEF-B636-9082DD9EFCF5}</Project>
       <Name>GardenManager.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GardenManager.Web.UI\GardenManager.Web.UI.csproj">
+      <Project>{6F7FF05D-40A4-48AD-A2F5-4EDCD7CC22EC}</Project>
+      <Name>GardenManager.Web.UI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Clipboard.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="css\" />
   </ItemGroup>
 </Project>
