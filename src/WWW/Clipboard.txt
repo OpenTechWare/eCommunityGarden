@@ -1,0 +1,6 @@
+﻿
+				<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Hm&t=Humidity';">
+				<div class="hd">Humidity</div>
+				  <%= getDataScript("Hm", "humidity") %>
+				  <div class="bdy"><span class="lval"><%= getLatestValue("Hm") %>%</span></div>
+				</div>

@@ -5,13 +5,21 @@ namespace GardenManager.Core
 {
 	public class DataLogParser
 	{
-		public int MaxPoints = 1000;
+		public int MaxPoints = 10;
 		public int TotalPoints = 0;
 		public int IncludeLatestDataPoints = 5;
 
 		public DataLogParser ()
 		{
 		}
+
+		public void Parse(string data)
+		{
+			foreach (var line in data.Split('\n')) {
+
+			}
+		}
+
 		public Dictionary<string, Dictionary<string, double>> GetValues(string data, params string[] keys)
 		{
 			var dict = new Dictionary<string, Dictionary<string, double>> ();

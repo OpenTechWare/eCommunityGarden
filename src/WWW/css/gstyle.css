@@ -1,0 +1,9 @@
+﻿/* Graph panel (large) */
+.grphpnl
+{
+  border: solid 1px lightblue;
+  float: left;
+  width: 820px;
+  height: 600px;
+  margin: 10px;
+}
