@@ -4,8 +4,8 @@
 
 // Moisture data variables
 int moistureValue    = 0;
-int moistureSensorHigh     = 1030;
-int moistureSensorLow      = 350;
+int moistureSensorHigh     = 1023;
+int moistureSensorLow      = 0;
 int moistureValueHigh      = 100;
 int moistureValueLow       = 0;
 
