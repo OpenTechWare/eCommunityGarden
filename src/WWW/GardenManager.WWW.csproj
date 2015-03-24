@@ -50,6 +50,7 @@
     <Content Include="css\style.css" />
     <Content Include="css\gstyle.css" />
     <Content Include="EditDevice.aspx" />
+    <Content Include="css\fstyle.css" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Global.asax.cs">

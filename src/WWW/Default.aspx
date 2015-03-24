@@ -1,194 +1,86 @@
-<%@ Page Language="C#" %>
-<%@ Import Namespace="System.Collections.Generic" %>
-<%@ Import Namespace="System.IO" %>
+﻿<%@ Page Language="C#" %>
 <%@ Import Namespace="GardenManager.Core" %>
+<%@ Import Namespace="GardenManager.Web.UI" %>
 <!DOCTYPE html>
 <html>
-<head>
-	<link rel="stylesheet" type="text/css" href="style.css">
+<head runat="server">
+	<title>Default</title>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/istyle.css">
 	<script runat="server">
+	DeviceId[] deviceIds;
+	DataStore Store = new DataStore();
 
-			int maxPoints = 10000;
-			int totalPoints = 0;
-			
-			Dictionary<string, Dictionary<string, double>> data = new Dictionary<string, Dictionary<string, double>>();
+	void Page_Load(object sender, EventArgs e)
+	{
+		var store = new DataStore();
 
-			void Page_Load(object sender, EventArgs e)
-			{
+		var conversion = new DataConversion(store);
+		conversion.ConvertFileToData();
 
-				var keys = new string[]{ "Tmp", "Hm", "Lt", "Mst", "Fl" };
+		deviceIds = store.GetDeviceIds();
+	}
 
-				var conversion = new DataConversion();
-				conversion.ConvertFileToData();
+	string[] GetKeys(DeviceId deviceId)
+	{
+		return Store.GetDataKeys(deviceId);
+	}
 
-				var store = new DataStore();
+	string GetLatestValue(DeviceId deviceId, string key)
+	{
+		var value = Store.GetLatestValue(deviceId, key);
 
-				foreach (var key in keys)
-					data.Add(key, store.GetValues(key));
+		return ValueHelper.GetValue(key, value);
+	}
 
-				//totalPoints = parser.TotalPoints;
-			}
+	string GetDeviceLabel(DeviceId deviceId)
+	{
+		var title = "";
+		var description = "";
 
-			string getDataScript(string key, string id)
-			{
-				var color = "lightblue";
+		var name = Store.GetDeviceName(deviceId);
 
-				switch (key)
-				{
-					case "Tmp":
-						color = "darkred";
-						break;
-					case "Lt":
-						color = "orange";
-						break;
-					case "Hm":
-						color = "green";
-						break;
-					case "Mst":
-						color = "navy";
-						break;
-				}
-
-				var data = getLatestData(key);
-
-				int i = 0;
-				var builder = new StringBuilder();
-				builder.AppendLine(
-@"<canvas id=""" + id + @""" width=""150"" height=""230"" style=""float:right""></canvas>"
-				);
-				builder.AppendLine("<script>");
-				builder.AppendLine("var " + id + @"Data = {");
-          		builder.Append("	labels : [");
-				foreach (var t in data.Keys)
-				{
-					builder.Append("\"");
-          			builder.Append("");
-          			//builder.Append(DateTime.Parse(t).ToShortTimeString());
-					builder.Append("\"");
-					if (i < data.Count-1)
-						builder.Append(",");
-
-					i++;
-				}
-
-          		builder.Append(@"],
-	datasets : [
-              	{
-                  fillColor : """ + color + @""",
-                  strokeColor : """ + color + @""",
-                  ");
-
-				builder.Append("data : [");
-				i=0;
-				foreach (var t in data.Keys)
-				{
-					builder.Append(data[t]);
-					if (i < data.Count-1)
-						builder.Append(",");
-
-					i++;
-				}
-				builder.Append(@"]
-              }
-          ]
-      }
-
-      var options = {      
-        scaleOverride: true,
-        scaleSteps: 10,
-        scaleStepWidth: Math.ceil(100 / 10),
-        scaleStartValue: 0
-      };
-
-      // get bar chart canvas
-      var " + id + @" = document.getElementById(""" + id + @""").getContext(""2d"");
-      // draw bar chart
-      new Chart(" + id + @").Line(" + id + @"Data, options);");
-      builder.AppendLine("<" + "/script>");
-
-				return builder.ToString();
-			}
-
-			Dictionary<string, double> getLatestData(string key)
-			{
-				var selectedData = data[key];
-
-				var latestData = new Dictionary<string, double>();
-
-				int i = selectedData.Keys.Count;
-				if (data.Count > 0)
-				{
-					foreach (var t in selectedData.Keys)
-					{
-						if (i <= 3)
-						{
-							latestData.Add(t, selectedData[t]);
-						}
-
-						i--;
-					}
-				}
-				return latestData;
-			}
-				
-		double getLatestValue(string sensorKey)
+		if (name != String.Empty)
 		{
-			double val = 0;
-
-			foreach (var timeKey in data[sensorKey].Keys)
-			{
-				val = data[sensorKey][timeKey];
-			}
-
-			return val;
+			title = name;
+			description = "Device " + deviceId.ToString();
 		}
+		else
+			title = "Device " + deviceId.ToString();
+
+		return "<div class='rhd'>" + title + @"</div>
+			<div class='desc'>" + description + "</div>";
+	}
+
 	</script>
     <script type="text/javascript" src='Chart.min.js'></script>
-    <script type="text/javascript" src='jquery-2.1.3.min.js'></script>
 </head>
 <body>
-<script type="text/javascript">
-$(document).ready(
-  function() {
-    var colorOrig=$('.pnl').css('background-color');
-    $('.pnl').hover(
-    function() {
-        //mouse over
-        $(this).css('background', 'lightgray');
-    }, function() {
-        //mouse out
-        $(this).css('background', colorOrig);
-    });
-}); 
-</script>
-<div class="buttons">
-	<div class="ref button" onclick="window.location.reload()">
-  		Refresh
+	<form id="form1" runat="server">
+		<div class="pghd">eCommunityGarden</div>
+	<% foreach (var deviceId in deviceIds) { %>
+	<div class="row">
+		<div class="rowlbl" onclick="window.location.href = 'Device.aspx?id=<%= deviceId.ToString() %>';">
+			<%= GetDeviceLabel(deviceId) %>
+		</div>
+		<div class="rowbtn">
+			[<a href="EditDevice.aspx?id=<%= deviceId.ToString() %>">edit</a>]
+		</div>
+		<div>
+		<% foreach (var key in GetKeys(deviceId)) { %>
+		<div class="mpnl" onclick="window.location.href = 'Graph.aspx?id=<%= deviceId.ToString() %>&k=<%= key %>';">
+		<div class="shd"><%= LabelHelper.GetLabel(key) %></div>
+
+		<span class="mval"><%= GetLatestValue(deviceId, key) %></span>
+		<span class="mgrph">
+		<%= new Grapher{Height=80, Width=50, ScaleShowLabels=false}.GetGraphScript(deviceId, key, 2) %>
+		</span>
+		</div>
+		<% } %>
+		</div>
 	</div>
-</div>
-	<div class="panels">
-		<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Tmp&t=Temperature';">
-		  <div class="hd">Temperature</div>
-		  <%= getDataScript("Tmp", "temperature") %>
-		  <div class="bdy">
-		    <span class="lval"><%= getLatestValue("Tmp") %>c</span>
-		  </div>
-		</div>
-		<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Hm&t=Humidity';">
-		<div class="hd">Humidity</div>
-		  <%= getDataScript("Hm", "humidity") %>
-		  <div class="bdy"><span class="lval"><%= getLatestValue("Hm") %>%</span></div>
-		</div>
-		<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Lt&t=Light';">
-		<div class="hd">Light</div>
-		  <%= getDataScript("Lt", "light") %>
-		  <div class="bdy"><span class="lval"><%= getLatestValue("Lt") %>%</span></div>
-		</div>
-		<div class="pnl" onclick="window.location.href = 'Graph.aspx?k=Mst&t=Soil+Moisture';">
-		<div class="hd">Soil Moisture</div>
-		  <%= getDataScript("Mst", "moisture") %>
-		  <div class="bdy"><span class="lval"><%= getLatestValue("Mst") %>%</span></div>
-		</div>
-  </div>
+	<% } %>
+	</form>
 </body>
 </html>
+

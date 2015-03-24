@@ -4,6 +4,7 @@
 <html>
 <head runat="server">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/fstyle.css">
 	<title>EditDevice</title>
 	<script runat="server">
 	DeviceId deviceId;
@@ -30,7 +31,8 @@
 </head>
 <body>
 	<form id="form1" runat="server">
-		<table width="400px">
+		<div class="pghd">eCommunityGarden  &raquo; <a href="Default.aspx">Home</a></div>
+		<table width="400px" class="frm">
 			<tr><td colspan="2" class="hd">Edit Device</td></tr>
 			<tr>
 				<td>Device ID:</td>
@@ -41,7 +43,8 @@
 				<td><asp:textbox runat="Server" value='<%# name.ToString() %>' id="Name"></asp:textbox></td>
 			</tr>
 			<tr>
-				<td></td><td><asp:button runat="server" id="SubmitButton" onClick="SubmitButton_Click" text="Save"></asp:button></td>
+				<td></td><td><asp:button runat="server" id="SubmitButton" onClick="SubmitButton_Click" text="Save"></asp:button>
+					<input type="button" value="Cancel" onclick="window.location.href='Default.aspx'"/></td>
 			</tr>
 		</table>
 	</form>
