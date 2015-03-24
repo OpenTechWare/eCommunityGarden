@@ -19,6 +19,16 @@ char* getTime()
   /* Get the current time and date from the chip */
   Time t = rtc.time();
 
+   
+//   rtc.minutes(38);
+   
+//   rtc.hour(13);
+
+//   rtc.month(3);
+   
+//   rtc.date(22);
+   
+//   rtc.year(2015);
   /* Format the time and date */
   snprintf(dateTime, sizeof(dateTime), "%04d-%02d-%02d %02d:%02d:%02d",
            t.yr, t.mon, t.date,
