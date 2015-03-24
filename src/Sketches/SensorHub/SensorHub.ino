@@ -1,5 +1,5 @@
 /*
-Code based on:
+Code based on examples provided by:
 http://arduino-info.wikispaces.com/Nrf24L01-2.4GHz-HowTo
 */
 
