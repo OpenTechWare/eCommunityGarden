@@ -37,15 +37,15 @@ char day[10];
 DS1302 rtc(RTC_CE_PIN, RTC_IO_PIN, RTC_SCLK_PIN);
 
 
-void setup()   /****** SETUP: RUNS ONCE ******/
+void setup()
 {
   Serial.begin(9600);
   delay(1000);
   Serial.println("Nrf24L01 Receiver Starting");
   radio.begin();
   radio.openReadingPipe(1,pipe);
-  radio.startListening();;
-}//--(end setup )---
+  radio.startListening();
+}
 
 
 void loop()   /****** LOOP: RUNS CONSTANTLY ******/
