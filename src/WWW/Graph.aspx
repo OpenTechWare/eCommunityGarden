@@ -30,10 +30,6 @@
 
 				var store = new DataStore();
 
-				var conversion = new DataConversion(store);
-				conversion.ConvertFileToData();
-
-
 				startTime = GetStartTime();
 				endTime = GetEndTime();
 

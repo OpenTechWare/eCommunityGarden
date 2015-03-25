@@ -32,9 +32,6 @@
 
 				var store = new DataStore();
 
-				var conversion = new DataConversion(store);
-				conversion.ConvertFileToData();
-
 				foreach (var key in keys)
 					data.Add(key, store.GetValues(deviceId, key));
 

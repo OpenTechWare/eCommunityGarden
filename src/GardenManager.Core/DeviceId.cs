@@ -28,7 +28,7 @@ namespace GardenManager.Core
 			);
 		}
 
-		public string ToString()
+		public override string ToString()
 		{
 			return Id1 + "." + Id2 + "." + Id3;
 		}

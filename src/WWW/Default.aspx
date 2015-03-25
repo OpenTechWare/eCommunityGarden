@@ -15,9 +15,6 @@
 	{
 		var store = new DataStore();
 
-		var conversion = new DataConversion(store);
-		conversion.ConvertFileToData();
-
 		deviceIds = store.GetDeviceIds();
 	}
 
@@ -79,6 +76,9 @@
 		<% } %>
 		</div>
 	</div>
+	<% } %>
+	<% if (deviceIds.Length == 0){ %>
+	<p>No devices detected. Please ensure they're running.</p>
 	<% } %>
 	</form>
 </body>

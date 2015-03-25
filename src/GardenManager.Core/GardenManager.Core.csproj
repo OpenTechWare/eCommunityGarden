@@ -44,7 +44,6 @@
     <Compile Include="DataStore.cs" />
     <Compile Include="DataConversion.cs" />
     <Compile Include="DateFormatter.cs" />
-    <Compile Include="Device.cs" />
     <Compile Include="DeviceId.cs" />
     <Compile Include="LabelHelper.cs" />
     <Compile Include="ValueHelper.cs" />
