@@ -9,5 +9,6 @@ echo "Installing libraries..."
 
 mono nuget.exe install NUnit
 mono nuget.exe install Sider
+mono nuget.exe install Quartz
 
 echo "Installation complete!"

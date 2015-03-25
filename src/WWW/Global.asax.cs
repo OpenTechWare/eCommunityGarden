@@ -6,12 +6,15 @@ namespace GardenManager
 	using System.ComponentModel;
 	using System.Web;
 	using System.Web.SessionState;
+	using Quartz;
+	using Quartz.Impl;
 
 	public class Global : System.Web.HttpApplication
 	{
 		
 		protected void Application_Start (Object sender, EventArgs e)
 		{
+			Schedule.Start ();
 		}
 
 		protected void Session_Start (Object sender, EventArgs e)
