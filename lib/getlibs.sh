@@ -1,5 +1,8 @@
 echo "Retrieving required libraries..."
 
+echo "Installing certificates..."
+mozroots --import --sync
+
 if [ ! -f nuget.exe ]; then
     echo "nuget.exe not found. Downloading..."
     wget http://nuget.org/nuget.exe
