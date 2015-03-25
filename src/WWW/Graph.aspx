@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<title>eCommunityGarden - Device - Graph</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/gstyle.css">
 	<script runat="server">

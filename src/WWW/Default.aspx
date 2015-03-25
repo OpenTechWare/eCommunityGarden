@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head runat="server">
-	<title>Default</title>
+	<title>eCommunityGarden</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/istyle.css">
 	<script runat="server">

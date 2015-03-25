@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<title>eCommunityGarden - Device</title>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/dstyle.css">
 	<script runat="server">
