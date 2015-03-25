@@ -1,0 +1,13 @@
+.frm
+{
+	margin: 10px;
+	border: solid 1px lightblue;
+	border-collapse: collapse;
+}
+
+.frm td
+{
+  	font-family: Verdana;
+  	font-size: 12px;
+  	padding: 4px;
+}
