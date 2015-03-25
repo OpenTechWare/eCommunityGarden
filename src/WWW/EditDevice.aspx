@@ -5,7 +5,7 @@
 <head runat="server">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/fstyle.css">
-	<title>EditDevice</title>
+	<title>eCommunityGarden - Edit Device</title>
 	<script runat="server">
 	DeviceId deviceId;
 	string name = String.Empty;

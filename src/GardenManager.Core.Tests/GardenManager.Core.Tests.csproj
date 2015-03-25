@@ -35,7 +35,7 @@
       <HintPath>..\..\lib\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Sider">
-      <HintPath>..\..\..\..\learn\Redis\lib\Sider.0.9.3\lib\net40-Client\Sider.dll</HintPath>
+      <HintPath>..\..\lib\Sider.0.9.3\lib\net40-Client\Sider.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
