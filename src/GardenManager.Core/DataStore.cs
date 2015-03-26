@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Sider;
 using System.Text;
+using System.Configuration;
 
 namespace GardenManager.Core
 {
@@ -39,16 +40,16 @@ namespace GardenManager.Core
 			client.Append(key, dataStringBuilder.ToString());
 		}*/
 
-		public string GetValue(DeviceId id, string key)
+		public string GetValue(DeviceId id, int sensorNumber)
 		{
 			var client = new RedisClient();
-			var fullKey = Prefix + "-Device-" + id.ToString () + "-" + key;
+			var fullKey = Prefix + "-Device-" + id.ToString () + "-Sensor-" + sensorNumber;
 			return client.Get (fullKey);
 		}
 
-		public Dictionary<string, double> GetValues(DeviceId id, string key)
+		public Dictionary<string, double> GetValues(DeviceId id, int sensorNumber)
 		{
-			var stringValue = GetValue (id, key);
+			var stringValue = GetValue (id, sensorNumber);
 
 			var lines = stringValue.Trim().Trim(';').Split (';');
 
@@ -70,9 +71,9 @@ namespace GardenManager.Core
 			return data;
 		}
 
-		public Dictionary<string, double> GetValues(DeviceId id, string key, DateTime startTime, DateTime endTime)
+		public Dictionary<string, double> GetValues(DeviceId id, int sensorNumber, DateTime startTime, DateTime endTime)
 		{
-			var data = GetValues (id, key);
+			var data = GetValues (id, sensorNumber);
 
 			var keptData = new Dictionary<string, double>();
 
@@ -124,58 +125,61 @@ namespace GardenManager.Core
 			return devices.Contains (id);
 		}
 
-		public void AddData(DeviceId id, string dateTime, Dictionary<string, string> data)
+		public void AddData(DeviceId id, int sensorNumber, DateTime dateTime, double value)
 		{
-			var client = new RedisClient ();
+			if (!SensorNumberExists (id, sensorNumber))
+				AddSensorNumber (id, sensorNumber);
+
+			var fullKey = Prefix + "-Device-" + id.ToString () + "-Sensor-" + sensorNumber;
+
+			var fullLine = dateTime + "," + value + ";\n";
+
+			var client = new RedisClient (); // TODO: Store this client for reuse
+			client.Append (fullKey, fullLine);
+		}
+
+		// TODO: Remove if not neede
+		/*public void AddData(DeviceId id, string dateTime, Dictionary<string, string> data)
+		{
 
 			foreach (var key in data.Keys) {
-
-				if (!DataKeyExists (id, key))
-					AddDataKey (id, key);
-
-				var fullKey = Prefix + "-Device-" + id.ToString () + "-" + key;
-
-				var value = data [key];
-
-				var fullLine = dateTime + "," + value + ";\n";
-
-				client.Append (fullKey, fullLine);
+				AddData (id, dateTime, data [key]);
 			}
-		}
+		}*/
 
-		public void AddDataKey(DeviceId id, string key)
+		public void AddSensorNumber(DeviceId id, int sensorNumber)
 		{
-			if (!DataKeyExists (id, key)) {
+			if (!SensorNumberExists (id, sensorNumber)) {
 				var client = new RedisClient ();
-				client.Append (Prefix + "-Device-" + id.ToString () + "-Keys", key + ";\n");
+				client.Append (Prefix + "-Device-" + id.ToString () + "-SensorNumbers", sensorNumber + ";\n");
 			}
 		}
 
-		public bool DataKeyExists(DeviceId id, string key)
+		public bool SensorNumberExists(DeviceId id, int sensorNumber)
 		{
-			var keys = new List<string> (GetDataKeys (id));
-			return keys.Contains (key);
+			var keys = new List<int> (GetSensorNumbers (id));
+			return keys.Contains (sensorNumber);
 		}
 
-		public string[] GetDataKeys(DeviceId id)
+		public int[] GetSensorNumbers(DeviceId id)
 		{
 
 			var client = new RedisClient();
-			var keysString = client.Get (Prefix + "-Device-" + id.ToString() + "-Keys");
-			var keys = new List<string> ();
+			var sensorNumbersString = client.Get (Prefix + "-Device-" + id.ToString() + "-SensorNumbers");
+			var sensorNumbers = new List<int> ();
 
-			if (!String.IsNullOrEmpty (keysString)) {
-				foreach (var key in keysString.Trim().Trim(';').Split(';')) {
-					keys.Add (key.Trim());
+			if (!String.IsNullOrEmpty (sensorNumbersString)) {
+				foreach (var sensorNumber in sensorNumbersString.Trim().Trim(';').Split(';')) {
+					sensorNumbers.Add (Convert.ToInt32(sensorNumber));
 				}
 			}
 
-			return keys.ToArray ();
+			return sensorNumbers.ToArray ();
 		}
 
-		public double GetLatestValue(DeviceId id, string key)
+		public double GetLatestValue(DeviceId id, int sensorNumber)
 		{
-			var values = GetValues (id, key);
+			var values = GetValues (id, sensorNumber);
 
 			var latestValue = 0.0;
 
@@ -192,10 +196,10 @@ namespace GardenManager.Core
 			var deviceIds = GetDeviceIds ();
 
 			foreach (var deviceId in deviceIds) {
-				var keys = GetDataKeys (deviceId);
+				var sensorNumbers = GetSensorNumbers (deviceId);
 
-				foreach (var key in keys) {
-					DeleteData (deviceId, key);
+				foreach (var sensorNumber in sensorNumbers) {
+					DeleteData (deviceId, sensorNumber);
 				}
 
 				DeleteKeys (deviceId);
@@ -204,16 +208,16 @@ namespace GardenManager.Core
 			DeleteDevices ();
 		}
 
-		public void DeleteData(DeviceId id, string key)
+		public void DeleteData(DeviceId id, int sensorNumber)
 		{
 			var client = new RedisClient ();
-			client.Del (Prefix + "-Device-" + id.ToString() + "-" + key);
+			client.Del (Prefix + "-Device-" + id.ToString() + "-Sensor-" + sensorNumber);
 		}
 
 		public void DeleteKeys(DeviceId id)
 		{
 			var client = new RedisClient ();
-			client.Del (Prefix + "-Device-" + id.ToString() + "-Keys");
+			client.Del (Prefix + "-Device-" + id.ToString() + "-SensorNumbers");
 		}
 
 		public void DeleteDevices()

@@ -23,35 +23,21 @@ namespace GardenManager.Web.UI
 		{
 		}
 
-		public string GetGraphScript(DeviceId id, string key)
+		public string GetGraphScript(DeviceId id, int sensorNumber)
 		{
-			return GetGraphScript (id, key, 0);
+			return GetGraphScript (id, sensorNumber, 0);
 		}
 
-		public string GetGraphScript(DeviceId id, string key, int points)
+		public string GetGraphScript(DeviceId id, int sensorNumber, int points)
 		{
 			var color = "lightblue";
 
-			var canvasId = "dev" + id.ToString ().Replace (".", "_") + "_" + key;
-			var dataId = "dev" + id.ToString ().Replace (".", "_") + "_" + key + "Data";
+			var canvasId = "dev" + id.ToString ().Replace (".", "_") + "_S" + sensorNumber;
+			var dataId = "dev" + id.ToString ().Replace (".", "_") + "_S" + sensorNumber + "Data";
 
-			switch (key)
-			{
-			case "Tmp":
-				color = "darkred";
-				break;
-			case "Lt":
-				color = "orange";
-				break;
-			case "Hm":
-				color = "green";
-				break;
-			case "Mst":
-				color = "navy";
-				break;
-			}
+			color = SensorConfig.GetColor (sensorNumber);
 
-			var data = GetLatestData(id, key, points);
+			var data = GetLatestData(id, sensorNumber, points);
 
 			int i = 0;
 			var builder = new StringBuilder();
@@ -114,9 +100,9 @@ namespace GardenManager.Web.UI
 			return builder.ToString();
 		}
 
-		public Dictionary<string, double> GetLatestData(DeviceId id, string key, int points)
+		public Dictionary<string, double> GetLatestData(DeviceId id, int sensorNumber, int points)
 		{
-			var selectedData = Store.GetValues(id, key, StartTime, EndTime);
+			var selectedData = Store.GetValues(id, sensorNumber, StartTime, EndTime);
 
 			var latestData = new Dictionary<string, double>();
 

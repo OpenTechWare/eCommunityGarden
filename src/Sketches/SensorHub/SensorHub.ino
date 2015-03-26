@@ -37,10 +37,6 @@ char day[10];
 /* Create a DS1302 object */
 DS1302 rtc(RTC_CE_PIN, RTC_IO_PIN, RTC_SCLK_PIN);
 
-const int lightSensorId = 1;
-const int soilMoistureSensorId = 2;
-const int temperatureSensorId = 3;
-
 void setup()
 {
   Serial.begin(9600);
@@ -73,8 +69,10 @@ void loop()
       Serial.print(".");
       Serial.print(data[2]);
       Serial.print(";");
-      Serial.print(getSensorLabel(data[3]));
-      Serial.print(":");     
+      Serial.print("S:");
+      Serial.print(data[3]);
+      Serial.print(";");
+      Serial.print("V:");   
       Serial.print(data[4]);
       Serial.print(";");
       //Serial.print("Tmp:");      
@@ -105,17 +103,4 @@ char* getTime()
            t.hr, t.min, t.sec);
 
   return dateTime;
-}
-
-char* getSensorLabel(int sensorId)
-{
-  switch (sensorId)
-  {
-    case lightSensorId:
-      return "Lt";
-    case soilMoistureSensorId:
-      return "Mst";
-    case temperatureSensorId:
-      return "Tmp";
-  }
 }

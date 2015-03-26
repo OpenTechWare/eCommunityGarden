@@ -11,52 +11,17 @@
 	<link rel="stylesheet" type="text/css" href="css/dstyle.css">
 	<script runat="server">
 
-			int maxPoints = 10000;
-			int totalPoints = 0;
-			bool autoRefresh = true;
+		DeviceId deviceId;
 
-			DeviceId deviceId;
+		DataStore Store = new DataStore();
 
-			DataStore Store = new DataStore();
-			
-			Dictionary<string, Dictionary<string, double>> data = new Dictionary<string, Dictionary<string, double>>();
-
-			void Page_Load(object sender, EventArgs e)
-			{
-
-				//var keys = new string[]{ "Tmp", "Hm", "Lt", "Mst", "Fl" };
-
-				var keys = new string[]{ "Tmp", "Lt", "Mst" };
-
-				deviceId = DeviceId.Parse(Request.QueryString["id"]);
-
-				var store = new DataStore();
-
-				foreach (var key in keys)
-					data.Add(key, store.GetValues(deviceId, key));
-
-				//totalPoints = parser.TotalPoints;
-
-				if (!IsPostBack)
-					DataBind();
-			}
-
-		double getLatestValue(string sensorKey)
+		void Page_Load(object sender, EventArgs e)
 		{
-			double val = 0;
 
-			foreach (var timeKey in data[sensorKey].Keys)
-			{
-				val = data[sensorKey][timeKey];
-			}
+			deviceId = DeviceId.Parse(Request.QueryString["id"]);
 
-			return val;
-		}
-
-
-		string[] getKeys(DeviceId deviceId)
-		{
-			return Store.GetDataKeys(deviceId);
+			if (!IsPostBack)
+				DataBind();
 		}
 	</script>
     <script type="text/javascript" src='script.js'></script>
@@ -92,18 +57,15 @@
 			</div>
 		</div>
 			<div class="panels">
-				<% foreach (var key in getKeys(deviceId)) { %>
-				<div class="pnl" onclick="window.location.href = 'Graph.aspx?id=<%= deviceId.ToString() %>&k=<%= key %>';">
-				  <div class="hd"><%= LabelHelper.GetLabel(key) %></div>
-				  <%= new Grapher{Width=150,Height=230}.GetGraphScript(deviceId, key, 4) %>
+				<% foreach (var sensorNumber in Store.GetSensorNumbers(deviceId)) { %>
+				<div class="pnl" onclick="window.location.href = 'Graph.aspx?id=<%= deviceId.ToString() %>&s=<%= sensorNumber %>';">
+				  <div class="hd"><%= SensorConfig.GetName(sensorNumber) %></div>
+				  <%= new Grapher{Width=150,Height=230}.GetGraphScript(deviceId, sensorNumber, 4) %>
 				  <div class="bdy">
-				    <span class="lval"><%= getLatestValue(key) %>c</span>
+				    <span class="lval"><%= SensorConfig.GetValueText(sensorNumber, Store.GetLatestValue(deviceId, sensorNumber)) %></span>
 				  </div>
 				</div>
 				<% } %>
-				<div id="options">
-					Auto refresh: <asp:CheckBox runat="server" id="AutoRefreshCheckBox" Checked='<%# autoRefresh %>' /><br/>
-				</div>
 		  </div>
   </form>
 </body>

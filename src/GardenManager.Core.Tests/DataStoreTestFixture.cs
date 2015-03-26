@@ -10,20 +10,17 @@ namespace GardenManager.Core.Tests
 		[Test]
 		public void Test_Add()
 		{
-			var data = new Dictionary<string, string> ();
-
 			var dateTime = DateTime.Now;
 
 			var id = DeviceId.Parse ("1.1.1");
 
+			var store = new DataStore ();
+
 			for (int i = 0; i < 10; i++) {
-				data.Add (dateTime.AddMinutes (i).ToString(), i + "." + i);
+				store.AddData (id, 1, dateTime.AddMinutes (i), i);
 			}
 
-			var store = new DataStore ();
-			store.AddData (id, "TestData", data);
-
-			var foundData = store.GetValues (id, "TestData");
+			var foundData = store.GetValues (id, 1);
 
 			foreach (var key in foundData.Keys) {
 				Console.Write (key);

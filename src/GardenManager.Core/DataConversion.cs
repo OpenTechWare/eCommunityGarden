@@ -17,32 +17,12 @@ namespace GardenManager.Core
 
 		public void ConvertFileToData()
 		{
-			var keys = new Hashtable ();
-			keys.Add ("Tmp", "Temperature");
-			//keys.Add ("Hm", "Humidity");
-			keys.Add ("Lt", "Light");
-			//keys.Add ("Fl", "Flow");
-			keys.Add ("Mst", "SoilMoisture");
-
 			var file = Path.GetFullPath ("serialLog.txt");
 
 			var data = File.ReadAllText (file);
 			File.WriteAllText (file, "");
 
 			ConvertStringToData (data);
-
-			//var parser = new DataLogParser ();
-
-			//var values = parser.Parse ();//.GetValues (data, keys.Keys.Cast<string>().ToArray());
-
-			/*var store = new DataStore ();
-
-			foreach (var key in keys.Keys) {
-				var d = values [key.ToString()];
-
-				store.Add (key.ToString(), d);
-			}*/
-
 		}
 
 		public void ConvertStringToData(string dataString)
@@ -60,26 +40,25 @@ namespace GardenManager.Core
 		{
 			try
 			{
-			var parts = dataLine.Split (';');
+				var parts = dataLine.Split (';');
 
-			//var dateTime = GetDateTime (parts);
+				var values = GetValues (parts);
 
-			//var id = DeviceId.Parse(GetID (parts));
+				var dateTime = DateTime.Parse(values ["T"]);
 
-			var values = GetValues (parts);
+				var deviceId = DeviceId.Parse (values ["Id"]);
 
-			var dateTime = values ["T"];
+				if (deviceId.ToString() != "0.0.0")
+				{
+					var sensorNumber = Convert.ToInt32(values ["S"]);
 
-			var id = DeviceId.Parse (values ["Id"]);
+					var value = Convert.ToDouble(values ["V"]);
 
-			// Remove the ID and time stamp from the data collection 
-			values.Remove ("T");
-			values.Remove ("Id");
+					if (!Store.DeviceExists(deviceId))
+						Store.AddDeviceId (deviceId);
 
-			if (!Store.DeviceExists(id))
-				Store.AddDeviceId (id);
-
-			Store.AddData (id, dateTime, values);
+					Store.AddData (deviceId, sensorNumber, dateTime, value);
+				}
 			}
 			catch {
 				Console.WriteLine ("Corrupt data line: " + dataLine);
@@ -116,7 +95,7 @@ namespace GardenManager.Core
 
 					var key = trimmedPart.Substring (0, trimmedPart.IndexOf (":"));
 
-						var valueString = trimmedPart.Replace (key + ":", "");//part.Substring (key.Length, part.Length - key.Length);
+						var valueString = trimmedPart.Replace (key + ":", "");
 
 						var value = valueString;
 
@@ -130,9 +109,6 @@ namespace GardenManager.Core
 		public bool IsValidPart(string part)
 		{
 			return part.Contains(":");
-			//part.StartsWith ("ID:") // ID
-			//&& !part.StartsWith ("T:") // Time
-			//&& 
 		}
 	}
 }

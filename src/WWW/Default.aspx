@@ -18,16 +18,16 @@
 		deviceIds = store.GetDeviceIds();
 	}
 
-	string[] GetKeys(DeviceId deviceId)
+	int[] GetSensorNumbers(DeviceId deviceId)
 	{
-		return Store.GetDataKeys(deviceId);
+		return Store.GetSensorNumbers(deviceId);
 	}
 
-	string GetLatestValue(DeviceId deviceId, string key)
+	string GetLatestValue(DeviceId deviceId, int sensorNumber)
 	{
-		var value = Store.GetLatestValue(deviceId, key);
+		var value = Store.GetLatestValue(deviceId, sensorNumber);
 
-		return ValueHelper.GetValue(key, value);
+		return SensorConfig.GetValueText(sensorNumber, value);
 	}
 
 	string GetDeviceLabel(DeviceId deviceId)
@@ -64,13 +64,13 @@
 			[<a href="EditDevice.aspx?id=<%= deviceId.ToString() %>">edit</a>]
 		</div>
 		<div>
-		<% foreach (var key in GetKeys(deviceId)) { %>
-		<div class="mpnl" onclick="window.location.href = 'Graph.aspx?id=<%= deviceId.ToString() %>&k=<%= key %>';">
-		<div class="shd"><%= LabelHelper.GetLabel(key) %></div>
+		<% foreach (var sensorNumber in GetSensorNumbers(deviceId)) { %>
+		<div class="mpnl" onclick="window.location.href = 'Graph.aspx?id=<%= deviceId.ToString() %>&s=<%= sensorNumber %>';">
+		<div class="shd"><%= SensorConfig.GetName(sensorNumber) %></div>
 
-		<span class="mval"><%= GetLatestValue(deviceId, key) %></span>
+		<span class="mval"><%= GetLatestValue(deviceId, sensorNumber) %></span>
 		<span class="mgrph">
-		<%= new Grapher{Height=80, Width=50, ScaleShowLabels=false}.GetGraphScript(deviceId, key, 2) %>
+		<%= new Grapher{Height=80, Width=50, ScaleShowLabels=false}.GetGraphScript(deviceId, sensorNumber, 2) %>
 		</span>
 		</div>
 		<% } %>

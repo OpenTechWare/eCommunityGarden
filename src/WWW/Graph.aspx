@@ -10,13 +10,8 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<link rel="stylesheet" type="text/css" href="css/gstyle.css">
 	<script runat="server">
-			int maxPoints = 10;
-			int totalPoints = 0;
-			
-			Dictionary<string, Dictionary<string, double>> data = new Dictionary<string, Dictionary<string, double>>();
 
-			string sensorKey = "";
-			string sensorTitle = "";
+			int sensorNumber = 0;
 			DeviceId deviceId;
 
 			DateTime startTime = DateTime.MinValue;
@@ -24,16 +19,13 @@
 
 			void Page_Load(object sender, EventArgs e)
 			{
-				sensorKey = Request.QueryString["k"];
-				sensorTitle = Request.QueryString["t"];
+				sensorNumber = Convert.ToInt32(Request.QueryString["s"]);
 				deviceId = DeviceId.Parse(Request.QueryString["id"]);
 
 				var store = new DataStore();
 
 				startTime = GetStartTime();
 				endTime = GetEndTime();
-
-				data.Add(sensorKey, store.GetValues(deviceId, sensorKey, startTime, endTime));
 			}
 
 			DateTime GetStartTime()
@@ -97,18 +89,6 @@
 
 		        return dt.AddDays(-1 * diff).Date;
 		    }
-				
-		double getLatestValue(string sensorKey)
-		{
-			double val = 0;
-
-			foreach (var timeKey in data[sensorKey].Keys)
-			{
-				val = data[sensorKey][timeKey];
-			}
-
-			return val;
-		}
 	</script>
     <script type="text/javascript" src='script.js'></script>
     <script type="text/javascript" src='Chart.min.js'></script>
@@ -116,7 +96,7 @@
 </head>
 <body id="body">
     <form runat="server">
-		<div class="pghd">eCommunityGarden &raquo; <a href="Default.aspx">Home</a>  &raquo; <a href="Device.aspx?id=<%= deviceId.ToString() %>">Device <%= deviceId.ToString() %></a>  &raquo; <%= LabelHelper.GetLabel(sensorKey) %></div>
+		<div class="pghd">eCommunityGarden &raquo; <a href="Default.aspx">Home</a>  &raquo; <a href="Device.aspx?id=<%= deviceId.ToString() %>">Device <%= deviceId.ToString() %></a>  &raquo; <%= SensorConfig.GetName(sensorNumber) %></div>
 		<div class="buttons">
 			<div class="bkpnl button" onclick="window.location.href='Device.aspx?id=<%= deviceId.ToString() %>'">
 			  &laquo; Back
@@ -139,8 +119,8 @@
 			</div>
 		</div>
 		<div class="grphpnl">
-		  <div class="hd"><%= LabelHelper.GetLabel(sensorKey) %></div>
-		  <%= new Grapher{Width=800,Height=500,StartTime=startTime,EndTime=endTime}.GetGraphScript(deviceId, sensorKey) %>
+		  <div class="hd"><%= SensorConfig.GetName(sensorNumber) %></div>
+		  <%= new Grapher{Width=800,Height=500,StartTime=startTime,EndTime=endTime}.GetGraphScript(deviceId, sensorNumber) %>
 		  <div class="times">
 		  <span style="float:left">From: <%= DateFormatter.Format(startTime) %></span>
 		  <span style="float:right">To: <%= DateFormatter.Format(endTime) %></span></div>
