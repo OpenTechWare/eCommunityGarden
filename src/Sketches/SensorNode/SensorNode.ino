@@ -18,9 +18,18 @@ const uint64_t pipe = 0xE8E8F0F0E1LL; // Define the transmit pipe
 RF24 radio(CE_PIN, CSN_PIN); // Create a Radio
 
 /*-----( Declare Variables )-----*/
-int data[6];
+int data[5];
 
-int id[] = {1, 1, 1};
+int id[] = {1, 1, 2};
+
+const int lightSensorId = 1;
+const int soilMoistureSensorId = 2;
+const int temperatureSensorId = 3;
+
+int sensorNumber = 0;
+
+int sensorValues[3];
+int sensorLabels[] = { lightSensorId, soilMoistureSensorId, temperatureSensorId };
 
 void setup()
 {
@@ -40,12 +49,19 @@ void loop()
   double lightValue = map(analogRead(A4), 0, 1023, 0, 100);
   double moistureValue = map(analogRead(A5), 1023, 0, 0, 100);
   
+  sensorValues[0] = lightValue;
+  sensorValues[1] = moistureValue;
+  sensorValues[2] = temperatureValue;
+  
   data[0] = id[0];
   data[1] = id[1];
   data[2] = id[2];
-  data[3] = lightValue;
-  data[4] = moistureValue;
-  data[5] = temperatureValue;
+  data[3] = sensorLabels[sensorNumber];
+  data[4] = sensorValues[sensorNumber];
+  
+  sensorNumber += 1;
+  if (sensorNumber >= 3)
+    sensorNumber = 0;
   
   radio.write( data, sizeof(data) );
 }

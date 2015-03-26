@@ -21,8 +21,9 @@ const uint64_t pipe = 0xE8E8F0F0E1LL; // Define the transmit pipe
 
 /*-----( Declare objects )-----*/
 RF24 radio(NRF_CE_PIN, NRF_CSN_PIN); // Create a Radio
+
 /*-----( Declare Variables )-----*/
-int data[6];
+int data[5];
 
 /* RTC */
 uint8_t RTC_CE_PIN   = 5;
@@ -36,6 +37,9 @@ char day[10];
 /* Create a DS1302 object */
 DS1302 rtc(RTC_CE_PIN, RTC_IO_PIN, RTC_SCLK_PIN);
 
+const int lightSensorId = 1;
+const int soilMoistureSensorId = 2;
+const int temperatureSensorId = 3;
 
 void setup()
 {
@@ -48,7 +52,7 @@ void setup()
 }
 
 
-void loop()   /****** LOOP: RUNS CONSTANTLY ******/
+void loop()
 {
   if ( radio.available() )
   {
@@ -69,16 +73,15 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
       Serial.print(".");
       Serial.print(data[2]);
       Serial.print(";");
-      Serial.print("Lt:");
-      Serial.print(data[3]);
-      Serial.print(";");
-      Serial.print("Mst:");      
+      Serial.print(getSensorLabel(data[3]));
+      Serial.print(":");     
       Serial.print(data[4]);
       Serial.print(";");
-      Serial.print("Tmp:");      
-      Serial.println(data[5]);
+      //Serial.print("Tmp:");      
+      //Serial.println(data[5]);
+      Serial.println();
       
-      delay(100);
+      //delay(100);
     }
   }
   else
@@ -86,7 +89,7 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
       Serial.println("No radio available");
   }
   
-  delay(1000);
+  //delay(1000);
 }
 
 char* getTime()
@@ -102,4 +105,17 @@ char* getTime()
            t.hr, t.min, t.sec);
 
   return dateTime;
+}
+
+char* getSensorLabel(int sensorId)
+{
+  switch (sensorId)
+  {
+    case lightSensorId:
+      return "Lt";
+    case soilMoistureSensorId:
+      return "Mst";
+    case temperatureSensorId:
+      return "Tmp";
+  }
 }
