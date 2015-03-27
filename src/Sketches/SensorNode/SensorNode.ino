@@ -24,6 +24,17 @@ http://arduino-info.wikispaces.com/Nrf24L01-2.4GHz-HowTo
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
+#include <EEPROM.h>
+
+// Buttons
+#include <Button.h>
+
+// LCD Display
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+
+LiquidCrystal_I2C lcd(0x3F,16,2);
+
 
 // nRF pins
 #define CE_PIN   9
@@ -57,9 +68,9 @@ const int temperatureSensorNumber = 3;
 const int totalSensors = 3;
 
 // Define the sensor input pins
-#define lightSensorPin A4
-#define soilMoistureSensorPin A5
-#define temperatureSensorPin A3
+#define lightSensorPin A0
+#define soilMoistureSensorPin A1
+#define temperatureSensorPin A2
 // 3) Add more sensors pin declarations here
 // #define [name]SensorPin AX
 
@@ -70,6 +81,9 @@ int sensorNumbers[totalSensors];
 
 // Declare an array for the sensor values
 int sensorValues[totalSensors];
+
+// Declare an array for the sensor letters
+int sensorLetters[totalSensors];
 
 
 // Create nRF radio object
@@ -82,16 +96,41 @@ int data[5];
 // The current position in the list of sensors/values. It will increment automatically during each loop. (Don't modify this.)
 int sensorPosition = 0;
 
+
+Button idSelectButton = Button(2, &idSelectButtonHandler);
+Button idUpButton = Button(3, &idUpButtonHandler);
+Button idDownButton = Button(4, &idDownButtonHandler);
+
+//Keep pointers to all the buttons in an array for simpler handling of many buttons
+const int buttonAmount = 3;
+Button* buttons[buttonAmount] = {
+  &idSelectButton,
+  &idUpButton,
+  &idDownButton
+};
+
+int editIdPosition = -1;
+
+
 void setup()
 {
   Serial.begin(9600);
   radio.begin();
   radio.openWritingPipe(pipe);
+  
+  // Start LCD display
+  lcd.init();    
+  lcd.backlight();
+  
+  loadId();
+  refreshLCD();
 }
 
 
 void loop()
 {
+  detectButton();
+  
   // ========== Start Modification Area
   // !! Modify the following code when adding add new sensors
   
@@ -116,14 +155,17 @@ void loop()
   // Set the sensor values...
   
   // Light sensor
+  sensorLetters[2] = "L";
   sensorNumbers[0] = lightSensorNumber;
   sensorValues[0] = lightValue;
   
   // Soil moisture sensor
+  sensorLetters[1] = "M";
   sensorNumbers[1] = soilMoistureSensorNumber;
   sensorValues[1] = soilMoistureValue;
   
   // Temperature sensor
+  sensorLetters[2] = "T";
   sensorNumbers[2] = temperatureSensorNumber;
   sensorValues[2] = temperatureValue;
   
@@ -148,4 +190,134 @@ void loop()
     sensorPosition = 0;
   
   radio.write( data, sizeof(data) );
+  
+  lazyRefreshLCD();
+}
+
+void detectButton()
+{
+  for (int i = 0; i < buttonAmount; i++){
+    buttons[i]->read();
+  }
+}
+
+void idSelectButtonHandler(Button* button)
+{
+  if (button->pressed){
+    editIdPosition++;
+    if (editIdPosition > 2)
+      editIdPosition = 0;
+  }
+  else{
+    
+  }
+  
+  refreshLCD();
+}
+
+void idUpButtonHandler(Button* button)
+{
+  if (button->pressed){
+    id[editIdPosition]++;
+    if (id[editIdPosition] > 127)
+      id[editIdPosition] = 0;
+  }
+  else{
+    //Button released
+    
+  }
+  
+  saveId();
+  refreshLCD();
+}
+void idDownButtonHandler(Button* button)
+{
+  if (button->pressed){
+    id[editIdPosition]--;
+    if (id[editIdPosition] < 1)
+      id[editIdPosition] = 127;
+  }
+  else{
+    //Button released
+    
+  }
+  
+  saveId();
+  refreshLCD();
+}
+
+void refreshLCD()
+{
+  lcd.clear();
+  lcd.print("Id: ");
+  
+  for (int i = 0; i < 3; i++)
+  {
+    if (editIdPosition == i)
+      lcd.print("[");
+    lcd.print(id[i]);
+    if (editIdPosition == i)
+      lcd.print("]");
+      
+    if (i < 2)
+      lcd.print(".");
+  }
+  
+  lcd.setCursor(0, 1);
+  
+  for (int i = 0; i < totalSensors; i++)
+  {
+    lcd.print(sensorNumbers[i]);
+    lcd.print(":");
+    lcd.print(sensorValues[i]);
+    lcd.print(" ");
+  }
+}
+
+int skipRefreshCount = 0;
+
+void lazyRefreshLCD()
+{
+  skipRefreshCount++;
+  
+  if (skipRefreshCount > 10)
+  {
+    refreshLCD();
+    skipRefreshCount = 0;
+  }
+}
+
+void saveId()
+{
+  for (int i = 0; i < 3; i++)
+  {
+    if (EEPROM.read(i) != id[i])
+      EEPROM.write(i, id[i]);
+  }
+}
+
+void loadId()
+{
+  int foundId[3];
+  foundId[0] = EEPROM.read(0);
+  foundId[1] = EEPROM.read(1);
+  foundId[2] = EEPROM.read(2);
+  
+  Serial.print("EEPROM ID:");  
+  Serial.print(foundId[0]);  
+  Serial.print(".");
+  Serial.print(foundId[1]);  
+  Serial.print(".");
+  Serial.print(foundId[2]);
+  
+  if (foundId[0] > 0
+    && foundId[1] > 0
+    && foundId[2] > 0)
+  {
+  id[0] = foundId[0];
+  id[1] = foundId[1];
+  id[2] = foundId[2];
+  }
+    
+  
 }
