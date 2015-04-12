@@ -47,7 +47,6 @@ void setup()
   radio.startListening();
 }
 
-
 void loop()
 {
   if ( radio.available() )
