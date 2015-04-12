@@ -6,8 +6,6 @@ namespace GardenManager
 	using System.ComponentModel;
 	using System.Web;
 	using System.Web.SessionState;
-	using Quartz;
-	using Quartz.Impl;
 
 	public class Global : System.Web.HttpApplication
 	{
