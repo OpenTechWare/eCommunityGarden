@@ -88,7 +88,7 @@ namespace GardenManager.Web.UI
         scaleStepWidth: Math.ceil(100 / " + ScaleStepDivider + @"),
         scaleStartValue: 0,
 		scaleShowLabels: " + ScaleShowLabels.ToString().ToLower() + @",
-		animation=false
+		animation: false
       };
 
       // get bar chart canvas
