@@ -51,10 +51,19 @@
 
 	</script>
     <script type="text/javascript" src='Chart.min.js'></script>
+    <script type="text/javascript" src='script.js'></script>
 </head>
 <body>
 	<form id="form1" runat="server">
 		<div class="pghd">eCommunityGarden</div>
+		<div class="buttons">
+			<div id="RefreshButton" class="ref button" onclick="window.location.reload()">
+		  		Refresh
+			</div>
+			<div class="ref button" onclick="toggleFullScreen()">
+			  Full Screen
+			</div>
+		</div>
 	<% foreach (var deviceId in deviceIds) { %>
 	<div class="row">
 		<div class="rowlbl" onclick="window.location.href = 'Device.aspx?id=<%= deviceId.ToString() %>';">
