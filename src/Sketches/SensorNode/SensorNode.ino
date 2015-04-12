@@ -190,6 +190,19 @@ void loop()
   sensorPosition += 1;
   if (sensorPosition >= totalSensors)
     sensorPosition = 0;
+    
+  Serial.print("Id:");
+  Serial.print(id[0]);
+  Serial.print(".");
+  Serial.print(id[0]);
+  Serial.print(".");
+  Serial.print(id[0]);
+  Serial.print(";");
+  Serial.print("S:");
+  Serial.print(data[3]);
+  Serial.print(";V:");
+  Serial.print(data[4]);
+  Serial.println(";");
 
   radio.write( data, sizeof(data) );
   
