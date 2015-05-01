@@ -58,12 +58,12 @@ const uint64_t pipe = 0xE8E8F0F0E1LL;
 // !! Modify the following code when adding add new sensors
 
 // Define the sensor numbers
-const int lightSensorNumber = 1;
-const int soilMoistureSensorNumber = 2;
-const int temperatureSensorNumber = 3;
+const int lightSensorCode = 1;
+const int soilMoistureSensorCode = 2;
+const int temperatureSensorCode = 3;
 // 1) Add more sensor numbers here.
 //    Define the sensor number in the web.config file of the web application
-// const int [name]SensorNumber = 4;
+// const int [name]SensorCode = 4;
 
 // 2) Set this to the total number of sensors
 const int totalSensors = 3;
@@ -80,8 +80,13 @@ const int totalSensors = 3;
 // Define the sensor numbers array
 int sensorNumbers[totalSensors];
 
+// Define the sensor codes array
+int sensorCodes[totalSensors];
+
 // Declare an array for the sensor values
 int sensorValues[totalSensors];
+
+
 
 // Declare an array for the sensor letters
 char* sensorLetters[totalSensors];
@@ -91,7 +96,7 @@ char* sensorLetters[totalSensors];
 RF24 radio(CE_PIN, CSN_PIN);
 
 // Create an array to hold the data to be sent. (Don't modify this.)
-int data[5];
+int data[6];
 
 
 // The current position in the list of sensors/values. It will increment automatically during each loop. (Don't modify this.)
@@ -156,35 +161,39 @@ void loop()
   // Set the sensor values...
 
   // Light sensor
+  sensorNumbers[0] = 1;
   sensorLetters[0] = "L";
-  sensorNumbers[0] = lightSensorNumber;
+  sensorCodes[0] = lightSensorCode;
   sensorValues[0] = lightValue;
 
   // Soil moisture sensor
+  sensorNumbers[1] = 2;
   sensorLetters[1] = "M";
-  sensorNumbers[1] = soilMoistureSensorNumber;
+  sensorCodes[1] = soilMoistureSensorCode;
   sensorValues[1] = soilMoistureValue;
 
   // Temperature sensor
+  sensorNumbers[2] = 3;
   sensorLetters[2] = "T";
-  sensorNumbers[2] = temperatureSensorNumber;
+  sensorCodes[2] = temperatureSensorCode;
   sensorValues[2] = temperatureValue;
 
   // 5) Set additional sensor values here
   // sensorLetters[2] = "[letter]";
-  // sensorNumbers[3] = [name]SensorNumber;
+  // sensorCodes[3] = [name]SensorCode;
   // sensorValues[3] = [name]Value;
 
   // ========== End Modification Area
   // !! DO NOT modify the code below when adding sensors.
 
-  // Add the Id and the sensor number/value for the current position.
+  // Add the Id and the sensor code/value for the current position.
   // Only one sensor value is sent per time.
   data[0] = id[0];
   data[1] = id[1];
   data[2] = id[2];
   data[3] = sensorNumbers[sensorPosition];
-  data[4] = sensorValues[sensorPosition];
+  data[4] = sensorCodes[sensorPosition];
+  data[5] = sensorValues[sensorPosition];
 
   // Increment the sensor position to loop through each sensor value
   sensorPosition += 1;
