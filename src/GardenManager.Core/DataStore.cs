@@ -176,6 +176,8 @@ namespace GardenManager.Core
 				}
 			}
 
+			sensorNumbers.Sort ();
+
 			return sensorNumbers.ToArray ();
 		}
 
