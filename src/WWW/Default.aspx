@@ -27,7 +27,7 @@
 	{
 		var value = Store.GetLatestValue(deviceId, sensorNumber);
 
-		return SensorConfig.GetValueText(sensorNumber, value);
+		return SensorConfig.GetValueText(Store.GetSensorCode(deviceId, sensorNumber), value);
 	}
 
 	string GetDeviceLabel(DeviceId deviceId)
