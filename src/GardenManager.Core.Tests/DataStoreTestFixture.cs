@@ -17,7 +17,7 @@ namespace GardenManager.Core.Tests
 			var store = new DataStore ();
 
 			for (int i = 0; i < 10; i++) {
-				store.AddData (id, 1, dateTime.AddMinutes (i), i);
+				store.AddData (id, 1, 1, dateTime.AddMinutes (i), i);
 			}
 
 			var foundData = store.GetValues (id, 1);

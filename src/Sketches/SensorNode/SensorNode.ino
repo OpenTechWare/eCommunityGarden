@@ -70,8 +70,8 @@ const int totalSensors = 3;
 
 // Define the sensor input pins
 #define lightSensorPin A0
-#define soilMoistureSensorPin A1
-#define temperatureSensorPin A2
+#define temperatureSensorPin A1
+#define soilMoistureSensorPin A2
 // 3) Add more sensors pin declarations here
 // #define [name]SensorPin AX
 
@@ -129,7 +129,7 @@ void setup()
   lcd.backlight();
 
   loadId();
-  refreshLCD();
+  //refreshLCD();
 }
 
 
@@ -149,10 +149,14 @@ void loop()
   double soilMoistureValue = map(analogRead(soilMoistureSensorPin), 1023, 0, 0, 100);
 
   // Get the temperature sensor value
-  int temperatureValue = analogRead(temperatureSensorPin);
-  temperatureValue = log(((10240000/temperatureValue) - 10000));
-  temperatureValue = 1 / (0.001129148 + (0.000234125 * temperatureValue) + (0.0000000876741 * temperatureValue * temperatureValue * temperatureValue));
-  temperatureValue = temperatureValue - 273.15;
+  int temperatureValue = getCelsius(analogRead(temperatureSensorPin));
+
+  Serial.print("Light: ");
+  Serial.println(lightValue);
+  Serial.print("Moisture: ");
+  Serial.println(soilMoistureValue);
+  Serial.print("Temperature: ");
+  Serial.println(temperatureValue);
 
   // 4) Get the value of additional sensors here
   // double [name]Value = analogRead([name]SensorPin);
@@ -166,19 +170,21 @@ void loop()
   sensorCodes[0] = lightSensorCode;
   sensorValues[0] = lightValue;
 
-  // Soil moisture sensor
-  sensorNumbers[1] = 2;
-  sensorLetters[1] = "M";
-  sensorCodes[1] = soilMoistureSensorCode;
-  sensorValues[1] = soilMoistureValue;
-
   // Temperature sensor
+  sensorNumbers[1] = 2;
+  sensorLetters[1] = "T";
+  sensorCodes[1] = temperatureSensorCode;
+  sensorValues[1] = temperatureValue;
+  
+  // Soil moisture sensor
   sensorNumbers[2] = 3;
-  sensorLetters[2] = "T";
-  sensorCodes[2] = temperatureSensorCode;
-  sensorValues[2] = temperatureValue;
+  sensorLetters[2] = "M";
+  sensorCodes[2] = soilMoistureSensorCode;
+  sensorValues[2] = soilMoistureValue;
+
 
   // 5) Set additional sensor values here
+  // sensorNumbers[2] = 4;
   // sensorLetters[2] = "[letter]";
   // sensorCodes[3] = [name]SensorCode;
   // sensorValues[3] = [name]Value;
@@ -203,19 +209,22 @@ void loop()
   Serial.print("Id:");
   Serial.print(id[0]);
   Serial.print(".");
-  Serial.print(id[0]);
+  Serial.print(id[1]);
   Serial.print(".");
-  Serial.print(id[0]);
+  Serial.print(id[2]);
   Serial.print(";");
-  Serial.print("S:");
+  Serial.print("#:");
   Serial.print(data[3]);
   Serial.print(";V:");
+  Serial.print("S:");
   Serial.print(data[4]);
+  Serial.print(";V:");
+  Serial.print(data[5]);
   Serial.println(";");
 
   radio.write( data, sizeof(data) );
   
-  lazyRefreshLCD();
+  //lazyRefreshLCD();
 }
 
 void detectButton()
@@ -334,9 +343,20 @@ void loadId()
       Serial.print(".");
 
     if (foundId[i] > 0)
+      id[i] = 0;
+    else if (foundId[i] > 0)
       id[i] = foundId[i];
+
   }
 
 
 }
 
+double getCelsius(int analogInput) {
+ double temp;
+ temp = log(10000.0*((1024.0/analogInput-1))); 
+//         =log(10000.0/(1024.0/analogInput-1)) // for pull-up configuration
+ temp = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * temp * temp ))* temp );
+ temp = temp - 273.15;            // Convert Kelvin to Celcius
+ return temp;
+}

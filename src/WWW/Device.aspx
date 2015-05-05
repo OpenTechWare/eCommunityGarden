@@ -59,7 +59,7 @@
 			<div class="panels">
 				<% foreach (var sensorNumber in Store.GetSensorNumbers(deviceId)) { %>
 				<div class="pnl" onclick="window.location.href = 'Graph.aspx?id=<%= deviceId.ToString() %>&s=<%= sensorNumber %>';">
-				  <div class="hd"><%= SensorConfig.GetName(sensorNumber) %></div>
+				  <div class="hd"><%= sensorNumber %>. <%= SensorConfig.GetName(Store.GetSensorCode(deviceId, sensorNumber)) %></div>
 				  <%= new Grapher{Width=150,Height=230}.GetGraphScript(deviceId, sensorNumber, 4) %>
 				  <div class="bdy">
 				    <span class="lval"><%= SensorConfig.GetValueText(sensorNumber, Store.GetLatestValue(deviceId, sensorNumber)) %></span>

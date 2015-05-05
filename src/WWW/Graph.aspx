@@ -13,6 +13,7 @@
 
 			int sensorNumber = 0;
 			DeviceId deviceId;
+			int sensorCode = 0;
 
 			DateTime startTime = DateTime.MinValue;
 			DateTime endTime = DateTime.MinValue;
@@ -26,6 +27,8 @@
 
 				startTime = GetStartTime();
 				endTime = GetEndTime();
+
+				sensorCode = store.GetSensorCode(deviceId, sensorNumber);
 			}
 
 			DateTime GetStartTime()
@@ -96,7 +99,7 @@
 </head>
 <body id="body">
     <form runat="server">
-		<div class="pghd">eCommunityGarden &raquo; <a href="Default.aspx">Home</a>  &raquo; <a href="Device.aspx?id=<%= deviceId.ToString() %>">Device <%= deviceId.ToString() %></a>  &raquo; <%= SensorConfig.GetName(sensorNumber) %></div>
+		<div class="pghd">eCommunityGarden &raquo; <a href="Default.aspx">Home</a>  &raquo; <a href="Device.aspx?id=<%= deviceId.ToString() %>">Device <%= deviceId.ToString() %></a>  &raquo; <%= SensorConfig.GetName(sensorCode) %></div>
 		<div class="buttons">
 			<div class="bkpnl button" onclick="window.location.href='Device.aspx?id=<%= deviceId.ToString() %>'">
 			  &laquo; Back
@@ -119,7 +122,7 @@
 			</div>
 		</div>
 		<div class="grphpnl">
-		  <div class="hd"><%= SensorConfig.GetName(sensorNumber) %></div>
+		  <div class="hd"><%= SensorConfig.GetName(sensorCode) %></div>
 		  <%= new Grapher{Width=800,Height=500,StartTime=startTime,EndTime=endTime}.GetGraphScript(deviceId, sensorNumber) %>
 		  <div class="times">
 		  <span style="float:left">From: <%= DateFormatter.Format(startTime) %></span>

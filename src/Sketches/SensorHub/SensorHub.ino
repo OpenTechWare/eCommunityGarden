@@ -65,6 +65,9 @@ long previousMillis = 0;        // will store last time LED was updated
 // will quickly become a bigger number than can be stored in an int.
 long interval = 250; 
 
+long lastReceive = 0;
+long receiveTimeout = 3000;
+
 void setup()
 {
   Serial.begin(9600);
@@ -101,6 +104,7 @@ void loop()
     bool done = false;
     while (!done)
     {
+      lastReceive = millis();
 
       // Fetch the data payload
       done = radio.read( data, sizeof(data) );
@@ -135,7 +139,7 @@ void loop()
       currentId[1] = data[1];
       currentId[2] = data[2];
 
-      if (sensorPosition >= 2)
+      //if (sensorPosition >= 2)
         refreshLCD();
 
       if (sensorPosition >= 2)
@@ -150,6 +154,14 @@ void loop()
   {    
     Serial.println("No radio available");
     sensorPosition = 0;
+  }
+  
+  if (millis() > lastReceive + receiveTimeout)
+  {
+    Serial.println("No signal");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("No signal");
   }
 }
 

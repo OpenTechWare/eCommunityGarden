@@ -75,7 +75,7 @@
 		<div>
 		<% foreach (var sensorNumber in GetSensorNumbers(deviceId)) { %>
 		<div class="mpnl" onclick="window.location.href = 'Graph.aspx?id=<%= deviceId.ToString() %>&s=<%= sensorNumber %>';">
-		<div class="shd"><%= SensorConfig.GetName(sensorNumber) %></div>
+		<div class="shd"><%= sensorNumber %>. <%= SensorConfig.GetName(Store.GetSensorCode(deviceId, sensorNumber)) %></div>
 
 		<span class="mval"><%= GetLatestValue(deviceId, sensorNumber) %></span>
 		<span class="mgrph">

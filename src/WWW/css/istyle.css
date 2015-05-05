@@ -2,9 +2,11 @@
 
 .row
 {
-  /*border: solid 1px lightblue;*/
+  border: solid 1px lightblue;
   height: 120px;
   margin: 10px;
+  width: 100%;
+  float:left;
 }
 
 /* Mini panel */

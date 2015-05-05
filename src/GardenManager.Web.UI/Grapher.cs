@@ -35,7 +35,7 @@ namespace GardenManager.Web.UI
 			var canvasId = "dev" + id.ToString ().Replace (".", "_") + "_S" + sensorNumber;
 			var dataId = "dev" + id.ToString ().Replace (".", "_") + "_S" + sensorNumber + "Data";
 
-			color = SensorConfig.GetColor (sensorNumber);
+			color = SensorConfig.GetColor (Store.GetSensorCode(id, sensorNumber));
 
 			var data = GetLatestData(id, sensorNumber, points);
 

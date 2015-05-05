@@ -125,10 +125,12 @@ namespace GardenManager.Core
 			return devices.Contains (id);
 		}
 
-		public void AddData(DeviceId id, int sensorNumber, DateTime dateTime, double value)
+		public void AddData(DeviceId id, int sensorNumber, int sensorCode, DateTime dateTime, double value)
 		{
 			if (!SensorNumberExists (id, sensorNumber))
 				AddSensorNumber (id, sensorNumber);
+
+			SetSensorCode (id, sensorNumber, sensorCode);
 
 			var fullKey = Prefix + "-Device-" + id.ToString () + "-Sensor-" + sensorNumber;
 
@@ -191,6 +193,20 @@ namespace GardenManager.Core
 			return latestValue;
 		}
 
+		public int GetSensorCode(DeviceId id, int sensorNumber)
+		{
+			var client = new RedisClient();
+			var fullKey = GetSensorCodeKey (id, sensorNumber);
+			return Convert.ToInt32(client.Get (fullKey));
+		}
+
+		public void SetSensorCode(DeviceId id, int sensorNumber, int sensorCode)
+		{
+			var client = new RedisClient();
+			var fullKey = GetSensorCodeKey (id, sensorNumber);
+			client.Set (fullKey, sensorCode.ToString());
+		}
+
 		public void DeleteAll()
 		{
 			var deviceIds = GetDeviceIds ();
@@ -245,6 +261,12 @@ namespace GardenManager.Core
 		public string GetDeviceNameKey(DeviceId id)
 		{
 			var key = Prefix + "-" + id.ToString () + "-Name";
+			return key;
+		}
+
+		public string GetSensorCodeKey(DeviceId id, int sensorNumber)
+		{
+			var key = Prefix + "-" + id.ToString () + "-" + sensorNumber + "-Code";
 			return key;
 		}
 	}

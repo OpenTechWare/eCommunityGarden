@@ -50,14 +50,16 @@ namespace GardenManager.Core
 
 				if (deviceId.ToString() != "0.0.0")
 				{
-					var sensorNumber = Convert.ToInt32(values ["S"]);
+					var sensorNumber = Convert.ToInt32(values ["N"]);
+
+					var sensorCode = Convert.ToInt32(values ["S"]);
 
 					var value = Convert.ToDouble(values ["V"]);
 
 					if (!Store.DeviceExists(deviceId))
 						Store.AddDeviceId (deviceId);
 
-					Store.AddData (deviceId, sensorNumber, dateTime, value);
+					Store.AddData (deviceId, sensorNumber, sensorCode, dateTime, value);
 				}
 			}
 			catch {
